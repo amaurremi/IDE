@@ -1,6 +1,12 @@
 package ca.uwaterloo.ide.conversion
 
-trait IdeFromIfdsBuilder extends IdeProblem { this: IfdsProblem =>
+import ca.uwaterloo.ide.problem.IdeProblem
+import com.ibm.wala.dataflow.IFDS.TabulationProblem
+
+trait IdeFromIfdsBuilder extends IdeProblem {
+
+  type T; type P; type F // todo get rid of those?
+  val walaIfdsProblem: TabulationProblem[T, P, F]
 
   override type LatticeElem = IfdsLatticeElem
   override type IdeFunction = IfdsFunction

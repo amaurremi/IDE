@@ -1,13 +1,10 @@
 package ca.uwaterloo.ide.solver
 
-import ca.ide.problem.IdeProblem
-import ca.ide.types.Phis
-import ca.ide.util.TraverseGraph
 import ca.uwaterloo.ide.problem.IdeProblem
 import ca.uwaterloo.ide.types.Phis
 import ca.uwaterloo.ide.util.TraverseGraph
 
-trait IdeSolver extends JumpFuncs with ComputeValues with TraverseGraph with Phis { this: IdeProblem =>
+trait IdeSolver extends JumpFuncs with ComputeValues { this: IdeProblem =>
 
   /**
    * Runs the IDE instance defined in IdeProblem.
