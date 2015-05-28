@@ -1,0 +1,5 @@
+target/
+*.class
+.idea/
+.idea_modules
+projectFilesBackup/
