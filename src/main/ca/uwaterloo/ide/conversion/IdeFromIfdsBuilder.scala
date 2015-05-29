@@ -24,22 +24,19 @@ trait IdeFromIfdsBuilder extends IdeProblem {
 
   private[this] val walaFlowFunctionMap = walaIfdsProblem.getFunctionMap
 
-  override def normalFlowFunction(node: XNode, tpe: NodeType) =
-    zipWithId(walaFlowFunctionMap.getNormalFlowFunction(node.n.node, tpe.node).getTargets(node.d).intIterator)
+  override def normalFlowFunction(src: XNode, dest: Node) =
+    zipWithId(walaFlowFunctionMap.getNormalFlowFunction(src.n, dest).getTargets(src.d).intIterator)
 
-  override def normalPhiFlowFunction(node: XNode, tpe: NodeType)
-    = zipWithId(???)
+  override def returnFlowFunction(call: Node, src: XNode, dest: Node) = ???
 
-  override def returnFlowFunction(call: NodeType, node: XNode, tpe: NodeType) = ???
+  override def callToReturnFlowFunction(src: XNode, dest: Node)
+    = zipWithId(walaFlowFunctionMap.getCallToReturnFlowFunction(src.n, dest).getTargets(src.d).intIterator)
 
-  override def callToReturnFlowFunction(node: XNode, tpe: NodeType)
-    = zipWithId(walaFlowFunctionMap.getCallToReturnFlowFunction(node.n.node, tpe.node).getTargets(node.d).intIterator)
+  override def callFlowFunction(src: XNode, dest: Node)
+    = zipWithId(walaFlowFunctionMap.getCallFlowFunction())(src, dest)
 
-  override def callFlowFunction(node: XNode, tpe: NodeType)
-    = zipWithId(walaFlowFunctionMap.getCallFlowFunction())(node, tpe)
-
-  override def callNoneToReturnFlowFunction(node: XNode, tpe: NodeType)
-    = zipWithId(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(node.n.node, tpe.node).getTargets(node.d).intIterator)
+  override def callNoneToReturnFlowFunction(src: XNode, dest: Node)
+    = zipWithId(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(src.n, dest).getTargets(src.d).intIterator)
 
   private[this] def zipWithId(intIterator: IntIterator) =
     intIteratorToScala(intIterator) map { FactFunPair(_, IfdsIdFunction) }

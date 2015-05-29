@@ -17,32 +17,27 @@ trait IdeFlowFunctions { this: LabeledExplodedGraphTypes =>
   /**
    * Functions for inter-procedural edges from a call node to the corresponding start edges.
    */
-  def callFlowFunction(node: XNode, tpe: NodeType): Iterable[FactFunPair]
+  def callFlowFunction(src: XNode, dest: Node): Iterable[FactFunPair]
 
   /**
    * Functions for intra-procedural edges from a call to the corresponding return edges.
    */
-  def callToReturnFlowFunction(node: XNode, tpe: NodeType): Iterable[FactFunPair]
+  def callToReturnFlowFunction(src: XNode, dest: Node): Iterable[FactFunPair]
 
   /**
    * Functions for inter-procedural edges from an end node to the return node of the callee function.
    */
-  def returnFlowFunction(call: NodeType, node: XNode, tpe: NodeType): Iterable[FactFunPair]
+  def returnFlowFunction(call: Node, src: XNode, dest: Node): Iterable[FactFunPair]
 
   /**
    * Functions for all other (inter-procedural) edges.
    */
-  def normalFlowFunction(node: XNode, tpe: NodeType): Iterable[FactFunPair]
-
-  /**
-   * Functions for phi instructions.
-   */
-  def normalPhiFlowFunction(node: XNode, tpe: NodeType): Iterable[FactFunPair]
+  def normalFlowFunction(src: XNode, dest: Node): Iterable[FactFunPair]
 
   /**
    * Helper function analogous to callStartFns, but returns only the factoids, without the edge functions.
    */
-  def callStartD2s: (XNode, NodeType) => Iterable[Fact] =
+  def callStartD2s: (XNode, Node) => Iterable[Fact] =
     (node1, n2) =>
       callFlowFunction(node1, n2) map { _.d2 }
 

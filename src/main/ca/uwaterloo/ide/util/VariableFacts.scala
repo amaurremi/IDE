@@ -1,10 +1,9 @@
 package ca.uwaterloo.ide.util
 
+import ca.uwaterloo.ide.types.ExplodedGraphTypes
 import com.ibm.wala.classLoader.{IField, IMethod}
 import com.ibm.wala.ipa.cha.IClassHierarchy
 import com.ibm.wala.types.FieldReference
-import ca.ide.types.ExplodedGraphTypes
-import ca.uwaterloo.ide.types.ExplodedGraphTypes
 
 trait VariableFacts extends ExplodedGraphTypes with TraverseGraph with WalaInstructions {
 

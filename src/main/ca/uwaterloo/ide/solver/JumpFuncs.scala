@@ -1,10 +1,8 @@
 package ca.uwaterloo.ide.solver
 
-import com.ibm.wala.util.collections.HashSetMultiMap
-import ca.ide.problem.IdeProblem
-import ca.ide.util.TraverseGraph
 import ca.uwaterloo.ide.problem.IdeProblem
 import ca.uwaterloo.ide.util.TraverseGraph
+import com.ibm.wala.util.collections.HashSetMultiMap
 
 import scala.collection.JavaConverters._
 import scala.collection.{breakOut, mutable}
@@ -42,27 +40,22 @@ trait JumpFuncs {
    * Maps (sq, c, d4) to (d3, jumpFn) if JumpFn(sq, d3 -> c, d4) != Top
    * [28]
    */
-  private[this] val forwardExitD3s = new HashSetMultiMap[(NodeType, XNode), (Fact, IdeFunction)]
+  private[this] val forwardExitD3s = new HashSetMultiMap[(Node, XNode), (Fact, IdeFunction)]
 
   def computeJumpFuncs: Map[XEdge, IdeFunction] = {
     initialize()
     // [7-33]
-    while (pathWorklist.size > 0) {
+    while (pathWorklist.nonEmpty) {
       // [8-9] e = (sp, d1) -> (n, d2)
       val e = pathWorklist.dequeue()
       val f = jumpFn(e)
       val n = e.target
-      n.n match {
-        case PhiNode(pn) =>
-          forwardAnyNode(e, f)
-        case NormalNode(nn) =>
-          if (n.isCallNode)
-            forwardCallNode(e, f)
-          if (n.isExitNode)
-            forwardExitNode(e, f)
-          if (!n.isCallNode && !n.isExitNode)
-            forwardAnyNode(e, f)
-      }
+      if (n.isCallNode)
+        forwardCallNode(e, f)
+      if (n.isExitNode)
+        forwardExitNode(e, f)
+      if (!n.isCallNode && !n.isExitNode)
+        forwardAnyNode(e, f)
     }
     jumpFn.toMap
   }
@@ -97,14 +90,14 @@ trait JumpFuncs {
     }
   }
 
-  def forwardExitNodeSpecific(e: XEdge, f: IdeFunction, call: XNode, r: NodeType) = {
+  def forwardExitNodeSpecific(e: XEdge, f: IdeFunction, call: XNode, r: Node) = {
     val sp = e.source
     val c = call.n
     val d4 = call.d
     for {
       FactFunPair(d1, f4) <- callFlowFunction(XNode(c, d4), sp.n)
       if sp.d == d1
-      FactFunPair(d5, f5) <- returnFlowFunction(e.target, r)
+      FactFunPair(d5, f5) <- returnFlowFunction(c, e.target, r)
       rn = XNode(r, d5)
       sumEdge = XEdge(XNode(c, d4), rn)
       sumF = summaryFn(sumEdge)
@@ -128,13 +121,13 @@ trait JumpFuncs {
   }
 
   private[this] def forwardExitPropagate(
-    c: NodeType,
+    c: Node,
     d4: Fact,
     rn: XNode,
     fPrime: IdeFunction
   ) {
     for {
-      sq <- startNodes(c.node)
+      sq <- startNodes(c)
       (d3, f3) <- forwardExitD3s.get(sq, XNode(c, d4)).asScala
       if f3 != λTop
     } {
@@ -168,20 +161,12 @@ trait JumpFuncs {
   private[this] def forwardAnyNode(e: XEdge, f: IdeFunction) {
     val n = e.target
     for {
-      m <- followingNodes(n.n).toSeq
-      FactFunPair(d3, edgeFn) <- otherSuccEdgesWithPhi(n, m)
+      m <- followingNodes(n.n)
+      FactFunPair(d3, edgeFn) <- normalFlowFunction(n, m)
     } {
       propagate(XEdge(e.source, XNode(m, d3)), edgeFn ◦ f)
     }
   }
-
-  private[this] def otherSuccEdgesWithPhi(node: XNode, dest: NodeType) =
-    node.n match {
-      case NormalNode(n) =>
-        normalFlowFunction(node, dest)
-      case PhiNode(n) =>
-        normalPhiFlowFunction(node, dest)
-    }
 
   private[this] def propagate(e: XEdge, f: IdeFunction) {
     val jf = jumpFn(e)
@@ -199,19 +184,19 @@ trait JumpFuncs {
    */
   private class ForwardExitD4s {
 
-    private[this] val forwardExitD4s = new HashSetMultiMap[(NodeType, XNode), Fact]
-    private[this] val queriedExit = new HashSetMultiMap[(NodeType, NodeType), (XEdge, IdeFunction)]
+    private[this] val forwardExitD4s = new HashSetMultiMap[(Node, XNode), Fact]
+    private[this] val queriedExit = new HashSetMultiMap[(Node, Node), (XEdge, IdeFunction)]
 
-    def put(call: NodeType, sp: XNode, d: Fact) {
+    def put(call: Node, sp: XNode, d: Fact) {
       forwardExitD4s.put((call, sp), d)
     }
 
-    def get(e: XEdge, f: IdeFunction)(call: NodeType, sp: XNode): Set[Fact] = {
+    def get(e: XEdge, f: IdeFunction)(call: Node, sp: XNode): Set[Fact] = {
       queriedExit.put((call, sp.n), (e, f))
       forwardExitD4s.get(call, sp).asScala.toSet
     }
 
-    def getQueried(call: NodeType, sp: NodeType): Set[(XEdge, IdeFunction)] =
+    def getQueried(call: Node, sp: Node): Set[(XEdge, IdeFunction)] =
       queriedExit.get((call, sp)).asScala.toSet
   }
 }

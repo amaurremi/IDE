@@ -1,6 +1,6 @@
 package ca.uwaterloo.ide.util
 
-import ca.uwaterloo.ide.types.Phis
+import ca.uwaterloo.ide.types.{ExplodedGraphTypes, Phis}
 import com.ibm.wala.classLoader.IClass
 import com.ibm.wala.ipa.callgraph.CGNode
 import com.ibm.wala.ipa.callgraph.impl.ClassHierarchyMethodTargetSelector
@@ -8,8 +8,6 @@ import com.ibm.wala.ipa.cfg.BasicBlockInContext
 import com.ibm.wala.ssa._
 import com.ibm.wala.ssa.analysis.IExplodedBasicBlock
 import com.ibm.wala.types.MethodReference
-import ca.ide.types.Phis
-import ca.uwaterloo.ide.types.{ExplodedGraphTypes, Phis}
 
 import scala.collection.JavaConverters._
 import scala.collection.breakOut
@@ -50,8 +48,9 @@ trait WalaInstructions extends Phis { this: VariableFacts with ExplodedGraphType
     node.d match {
       case Variable(method, elem)                               =>
         val valNum = getValNum(elem, node)
-        val ir: IR = enclProc(node.n.node).getIR
-        firstParameter(node.n.node) to node.n.node.getMethod.getNumberOfParameters - 1 find {
+        val n = node.n
+        val ir: IR = enclProc(n).getIR
+        firstParameter(n) to n.getMethod.getNumberOfParameters - 1 find {
            ir.getParameter(_) == valNum
         }
       case ArrayElement | Field(_) | Lambda | ReturnSecretValue => None // todo fields???
@@ -60,8 +59,8 @@ trait WalaInstructions extends Phis { this: VariableFacts with ExplodedGraphType
   /**
    * Get all instructions following instruction in node `n` in its procedure.
    */
-  def followingInstructions(n: NodeType): Seq[SSAInstruction] =
-    followingNodes(n) map { _.node.getLastInstruction }
+  def followingInstructions(n: Node): Seq[SSAInstruction] =
+    followingNodes(n) map { _.getLastInstruction }
 
   /**
    * Get the value number for the ith parameter.
@@ -71,13 +70,13 @@ trait WalaInstructions extends Phis { this: VariableFacts with ExplodedGraphType
   def getValNumFromParameterNum(n: Node, argNum: Int): ValueNumber =
     enclProc(n).getIR.getSymbolTable.getParameter(argNum)
 
-  def getCallNodes(exit: NodeType, ret: NodeType): Seq[Node] = {
+  def getCallNodes(exit: Node, ret: Node): Seq[Node] = {
     callReturnPairs(exit) collect {
-      case (c: NodeType, r: NodeType) if r == ret => c.node
+      case (c: Node, r: Node) if r == ret => c
     }
   }
 
-  def getCallInstructions(exit: NodeType, ret: NodeType): Seq[SSAInvokeInstruction] =
+  def getCallInstructions(exit: Node, ret: Node): Seq[SSAInvokeInstruction] =
     getCallNodes(exit, ret) map {
       _.getLastInstruction match {
         case callInstr: SSAInvokeInstruction =>

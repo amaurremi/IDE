@@ -16,7 +16,7 @@ trait ExplodedGraphTypes extends SuperGraphTypes {
    * A node in the exploded supergraph
    */
   sealed trait XNode {
-    val n: NodeType
+    val n: Node
     val d: Fact
     val isStartNode: Boolean
     val isExitNode: Boolean
@@ -36,17 +36,17 @@ trait ExplodedGraphTypes extends SuperGraphTypes {
   }
 
   object XNode {
-    def apply(node: NodeType, fact: Fact): XNode =
+    def apply(node: Node, fact: Fact): XNode =
       new XNode {
         override val n = node
         override val d = fact
-        override lazy val isStartNode  = supergraph isEntry node.node // todo duplication for phis/normal nodes?
-        override lazy val isReturnNode = supergraph isReturn node.node
-        override lazy val isExitNode   = supergraph isExit node.node
-        override lazy val isCallNode   = supergraph isCall node.node
+        override lazy val isStartNode  = supergraph isEntry node
+        override lazy val isReturnNode = supergraph isReturn node
+        override lazy val isExitNode   = supergraph isExit node
+        override lazy val isCallNode   = supergraph isCall node
       }
 
-    def unapply(node: XNode): Option[(NodeType, Fact)] = Some(node.n, node.d)
+    def unapply(node: XNode): Option[(Node, Fact)] = Some(node.n, node.d)
   }
 
   /**

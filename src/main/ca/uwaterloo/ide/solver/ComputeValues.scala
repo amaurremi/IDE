@@ -57,7 +57,7 @@ trait ComputeValues { this: IdeProblem with TraverseGraph =>
     }
   }
 
-  private[this] def getJumpFnTargetFacts(ideNode1: XNode, node2: NodeType, jumpFn: JumpFn): Set[FactFunPair] =
+  private[this] def getJumpFnTargetFacts(ideNode1: XNode, node2: Node, jumpFn: JumpFn): Set[FactFunPair] =
     (jumpFn collect {
       case (XEdge(source, XNode(n, d)), f)
         if source == ideNode1 && n == node2 =>
@@ -67,7 +67,7 @@ trait ComputeValues { this: IdeProblem with TraverseGraph =>
   // [8-10]
   private[this] def computeStartNode(sp: XNode, jumpFunc: JumpFn) {
     for {
-      c                           <- callNodesInProc(enclProc(sp.n.node))
+      c                           <- callNodesInProc(enclProc(sp.n))
       FactFunPair(dPrime, fPrime) <- getJumpFnTargetFacts(sp, c, jumpFunc)
       if fPrime != λTop
     } {
