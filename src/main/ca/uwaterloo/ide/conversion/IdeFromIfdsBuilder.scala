@@ -33,11 +33,13 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   override def returnFlowFunction(call: NodeType, node: XNode, tpe: NodeType) = ???
 
   override def callToReturnFlowFunction(node: XNode, tpe: NodeType)
-    = zipWithId(walaFlowFunctionMap.getCallToReturnFlowFunction(node.n, tpe.node).getTargets(node.d).intIterator)(node, tpe)
+    = zipWithId(walaFlowFunctionMap.getCallToReturnFlowFunction(node.n.node, tpe.node).getTargets(node.d).intIterator)
 
   override def callFlowFunction(node: XNode, tpe: NodeType)
     = zipWithId(walaFlowFunctionMap.getCallFlowFunction())(node, tpe)
-  override def callNoneToReturnFlowFunction(node: XNode, tpe: NodeType) = ???
+
+  override def callNoneToReturnFlowFunction(node: XNode, tpe: NodeType)
+    = zipWithId(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(node.n.node, tpe.node).getTargets(node.d).intIterator)
 
   private[this] def zipWithId(intIterator: IntIterator) =
     intIteratorToScala(intIterator) map { FactFunPair(_, IfdsIdFunction) }
