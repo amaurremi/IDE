@@ -1,12 +1,18 @@
 package ca.uwaterloo.ide.conversion
 
 import ca.uwaterloo.ide.problem.IdeProblem
-import com.ibm.wala.dataflow.IFDS.TabulationProblem
+import com.ibm.wala.dataflow.IFDS.{IUnaryFlowFunction, IBinaryReturnFlowFunction, TabulationProblem}
+import com.ibm.wala.util.intset.{IntSet, IntIterator}
 
 trait IdeFromIfdsBuilder extends IdeProblem {
 
-  type T; type P; type F // todo get rid of those?
-  val walaIfdsProblem: TabulationProblem[T, P, F]
+//  T = Node, P = Procedure
+  type Fact = Int
+  type F
+  val walaIfdsProblem: TabulationProblem[Node, Procedure, F]
+
+  type IfdsEdgeFn      = (Node, Node) => Set[Fact]
+  type IfdsOtherEdgeFn = XNode => Set[Fact]
 
   override type LatticeElem = IfdsLatticeElem
   override type IdeFunction = IfdsFunction
@@ -16,14 +22,25 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   override val Id: IdeFunction     = IfdsIdFunction
   override val λTop: IdeFunction   = IfdsTopFunction
 
-  override def otherSuccEdges(node: XNode)                   = zipWithIdOther(ifdsOtherSuccEdges)(node)
-  override def otherSuccEdgesPhi(node: XNode)                = zipWithIdOther(ifdsOtherSuccEdgesPhi)(node)
-  override def endReturnEdges(node: XNode, tpe: NodeType)    = zipWithId(ifdsEndReturnEdges)(node, tpe)
-  override def callReturnEdges(node: XNode, tpe: NodeType)   = zipWithId(ifdsCallReturnEdges)(node, tpe)
-  override def callStartEdges(node: XNode, tpe: NodeType)    = zipWithId(ifdsCallStartEdges)(node, tpe)
+  private[this] val walaFlowFunctionMap = walaIfdsProblem.getFunctionMap
 
-  private[this] def zipWithId(f: IfdsEdgeFn)(ideN1: XNode, d1: NodeType) =
-    f(ideN1, d1) map { FactFunPair(_, IfdsIdFunction) }
+  override def normalFlowFunction(node: XNode, tpe: NodeType) =
+    zipWithId(walaFlowFunctionMap.getNormalFlowFunction(node.n.node, tpe.node).getTargets(node.d).intIterator)
+
+  override def normalPhiFlowFunction(node: XNode, tpe: NodeType)
+    = zipWithId(???)
+
+  override def returnFlowFunction(call: NodeType, node: XNode, tpe: NodeType) = ???
+
+  override def callToReturnFlowFunction(node: XNode, tpe: NodeType)
+    = zipWithId(walaFlowFunctionMap.getCallToReturnFlowFunction(node.n, tpe.node).getTargets(node.d).intIterator)(node, tpe)
+
+  override def callFlowFunction(node: XNode, tpe: NodeType)
+    = zipWithId(walaFlowFunctionMap.getCallFlowFunction())(node, tpe)
+  override def callNoneToReturnFlowFunction(node: XNode, tpe: NodeType) = ???
+
+  private[this] def zipWithId(intIterator: IntIterator) =
+    intIteratorToScala(intIterator) map { FactFunPair(_, IfdsIdFunction) }
 
   private[this] def zipWithIdOther(f: IfdsOtherEdgeFn)(ideN1: XNode) =
     f(ideN1) map { FactFunPair(_, IfdsIdFunction) }
@@ -56,5 +73,13 @@ trait IdeFromIfdsBuilder extends IdeProblem {
     override def ◦(f: IfdsFunction): IfdsFunction = IfdsTopFunction
 
     override def ⊓(f: IfdsFunction): IfdsFunction = f
+  }
+
+  private[this] def intIteratorToScala(intIterator: IntIterator): Iterable[Int] = {
+    var set = Iterable[Int]()
+    while (intIterator.hasNext) {
+      set ++= Seq(intIterator.next)
+    }
+    set
   }
 }

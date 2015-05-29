@@ -1,7 +1,5 @@
 package ca.uwaterloo.ide.solver
 
-import ca.ide.problem.IdeProblem
-import ca.ide.util.TraverseGraph
 import ca.uwaterloo.ide.problem.IdeProblem
 import ca.uwaterloo.ide.util.TraverseGraph
 
@@ -53,7 +51,7 @@ trait ComputeValues { this: IdeProblem with TraverseGraph =>
     val cn = c.n
     for {
       sq                          <- targetStartNodes(cn)
-      FactFunPair(dPrime, edgeFn) <- callStartEdges(c, sq)
+      FactFunPair(dPrime, edgeFn) <- callFlowFunction(c, sq)
     } {
       propagateValue(XNode(sq, dPrime), edgeFn(vals(c)))
     }

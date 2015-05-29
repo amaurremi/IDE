@@ -85,7 +85,7 @@ trait JumpFuncs {
     // [14-16]
     for {
       r                       <- returnNodes(node)
-      FactFunPair(d3, edgeFn) <- callReturnEdges(n, r)
+      FactFunPair(d3, edgeFn) <- callToReturnFlowFunction(n, r)
       rn                       = XNode(r, d3)
       re                       = XEdge(e.source, rn)
     } {
@@ -102,9 +102,9 @@ trait JumpFuncs {
     val c = call.n
     val d4 = call.d
     for {
-      FactFunPair(d1, f4) <- callStartEdges(XNode(c, d4), sp.n)
+      FactFunPair(d1, f4) <- callFlowFunction(XNode(c, d4), sp.n)
       if sp.d == d1
-      FactFunPair(d5, f5) <- endReturnEdges(e.target, r)
+      FactFunPair(d5, f5) <- returnFlowFunction(e.target, r)
       rn = XNode(r, d5)
       sumEdge = XEdge(XNode(c, d4), rn)
       sumF = summaryFn(sumEdge)
@@ -169,18 +169,18 @@ trait JumpFuncs {
     val n = e.target
     for {
       m <- followingNodes(n.n).toSeq
-      FactFunPair(d3, edgeFn) <- otherSuccEdgesWithPhi(n)
+      FactFunPair(d3, edgeFn) <- otherSuccEdgesWithPhi(n, m)
     } {
       propagate(XEdge(e.source, XNode(m, d3)), edgeFn ◦ f)
     }
   }
 
-  private[this] def otherSuccEdgesWithPhi(node: XNode) =
+  private[this] def otherSuccEdgesWithPhi(node: XNode, dest: NodeType) =
     node.n match {
       case NormalNode(n) =>
-        otherSuccEdges(node)
+        normalFlowFunction(node, dest)
       case PhiNode(n) =>
-        otherSuccEdgesPhi(node)
+        normalPhiFlowFunction(node, dest)
     }
 
   private[this] def propagate(e: XEdge, f: IdeFunction) {
