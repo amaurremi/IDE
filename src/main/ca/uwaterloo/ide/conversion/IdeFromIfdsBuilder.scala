@@ -1,8 +1,8 @@
 package ca.uwaterloo.ide.conversion
 
 import ca.uwaterloo.ide.problem.IdeProblem
-import com.ibm.wala.dataflow.IFDS.{IUnaryFlowFunction, IBinaryReturnFlowFunction, TabulationProblem}
-import com.ibm.wala.util.intset.{IntSet, IntIterator}
+import com.ibm.wala.dataflow.IFDS.TabulationProblem
+import com.ibm.wala.util.intset.IntIterator
 
 trait IdeFromIfdsBuilder extends IdeProblem {
 
