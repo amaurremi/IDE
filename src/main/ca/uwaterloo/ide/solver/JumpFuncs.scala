@@ -69,7 +69,8 @@ trait JumpFuncs {
     val node = n.n
     for {
       sq <- targetStartNodes(node)
-      d3 <- callStartD2s(n, sq)
+      r  <- returnNodes(node)
+      d3 <- callStartD2s(n, sq, r)
     } {
       val sqn = XNode(sq, d3)
       propagate(XEdge(sqn, sqn), Id)
@@ -94,10 +95,16 @@ trait JumpFuncs {
     val sp = e.source
     val c = call.n
     val d4 = call.d
+    val returnPairs = returnFlowFunction(c, e.target, r) match {
+      case BinaryReturnFlowFunction(fun)   =>
+        fun(d4)
+      case UnaryReturnFlowFunction(ffps) =>
+        ffps
+    }
     for {
-      FactFunPair(d1, f4) <- callFlowFunction(XNode(c, d4), sp.n)
+      FactFunPair(d1, f4) <- callFlowFunction(XNode(c, d4), sp.n, r)
       if sp.d == d1
-      FactFunPair(d5, f5) <- returnFlowFunction(c, e.target, r)
+      FactFunPair(d5, f5) <- returnPairs
       rn = XNode(r, d5)
       sumEdge = XEdge(XNode(c, d4), rn)
       sumF = summaryFn(sumEdge)

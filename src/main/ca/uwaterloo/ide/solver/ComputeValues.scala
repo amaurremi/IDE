@@ -50,8 +50,9 @@ trait ComputeValues { this: IdeProblem with TraverseGraph =>
   private[this] def computeCallNode(c: XNode) {
     val cn = c.n
     for {
+      r                           <- returnNodes(cn)
       sq                          <- targetStartNodes(cn)
-      FactFunPair(dPrime, edgeFn) <- callFlowFunction(c, sq)
+      FactFunPair(dPrime, edgeFn) <- callFlowFunction(c, sq, r)
     } {
       propagateValue(XNode(sq, dPrime), edgeFn(vals(c)))
     }

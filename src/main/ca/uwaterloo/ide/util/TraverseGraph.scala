@@ -53,7 +53,7 @@ trait TraverseGraph { this: ExplodedGraphTypes with Phis =>
    * Given the exit node of procedure p, returns all pairs (c, r), where c calls p with corresponding
    * return-site node r.
    */
-  def callReturnPairs(exit: Node): Seq[(Node, Node)] =
+  def callReturnPairs(exit: Node): Seq[(Node, Node)] = // todo is that right?
     for {
       r <- followingNodes(exit)
       rn = r

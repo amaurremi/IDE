@@ -14,10 +14,20 @@ trait IdeFlowFunctions { this: LabeledExplodedGraphTypes =>
     edgeFn: IdeFunction
   )
 
+  // todo documentation
+  sealed trait ReturnFlowFunctionType
+  case class BinaryReturnFlowFunction(callFact: Fact => Iterable[FactFunPair]) extends ReturnFlowFunctionType
+  case class UnaryReturnFlowFunction(pairs: Iterable[FactFunPair]) extends ReturnFlowFunctionType
+
   /**
    * Functions for inter-procedural edges from a call node to the corresponding start edges.
    */
-  def callFlowFunction(src: XNode, dest: Node): Iterable[FactFunPair]
+  def callFlowFunction(src: XNode, dest: Node, ret: Node): Iterable[FactFunPair]
+
+  /**
+   * the flow function for a call-return edge, when the supergraph does not contain any callees of src
+   */
+  def callNoneToReturnFlowFunction(src: XNode, dest: Node): Iterable[FactFunPair]
 
   /**
    * Functions for intra-procedural edges from a call to the corresponding return edges.
@@ -27,7 +37,7 @@ trait IdeFlowFunctions { this: LabeledExplodedGraphTypes =>
   /**
    * Functions for inter-procedural edges from an end node to the return node of the callee function.
    */
-  def returnFlowFunction(call: Node, src: XNode, dest: Node): Iterable[FactFunPair]
+  def returnFlowFunction(callN: Node, src: XNode, dest: Node): ReturnFlowFunctionType
 
   /**
    * Functions for all other (inter-procedural) edges.
@@ -37,9 +47,8 @@ trait IdeFlowFunctions { this: LabeledExplodedGraphTypes =>
   /**
    * Helper function analogous to callStartFns, but returns only the factoids, without the edge functions.
    */
-  def callStartD2s: (XNode, Node) => Iterable[Fact] =
-    (node1, n2) =>
-      callFlowFunction(node1, n2) map { _.d2 }
+  def callStartD2s(node1: XNode, n2: Node, ret: Node): Iterable[Fact] =
+      callFlowFunction(node1, n2, ret) map { _.d2 }
 
   final val idFactFunPairSet = (d: Fact) => Set(FactFunPair(d, Id))
 }

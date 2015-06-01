@@ -1,7 +1,7 @@
 package ca.uwaterloo.ide.conversion
 
 import ca.uwaterloo.ide.problem.IdeProblem
-import com.ibm.wala.dataflow.IFDS.TabulationProblem
+import com.ibm.wala.dataflow.IFDS.{IBinaryReturnFlowFunction, IUnaryFlowFunction, IFlowFunction, TabulationProblem}
 import com.ibm.wala.util.intset.IntIterator
 
 trait IdeFromIfdsBuilder extends IdeProblem {
@@ -27,18 +27,28 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   override def normalFlowFunction(src: XNode, dest: Node) =
     zipWithId(walaFlowFunctionMap.getNormalFlowFunction(src.n, dest).getTargets(src.d).intIterator)
 
-  override def returnFlowFunction(call: Node, src: XNode, dest: Node) = ???
+  override def returnFlowFunction(call: Node, src: XNode, dest: Node): ReturnFlowFunctionType = {
+    walaFlowFunctionMap.getReturnFlowFunction(call, src.n, dest) match {
+      case u: IUnaryFlowFunction        =>
+        UnaryReturnFlowFunction(zipWithId(u.getTargets(src.d).intIterator))
+      case b: IBinaryReturnFlowFunction =>
+        BinaryReturnFlowFunction(
+          d4 =>
+            zipWithId(b.getTargets(d4, src.d).intIterator))
+    }
+  }
 
   override def callToReturnFlowFunction(src: XNode, dest: Node)
     = zipWithId(walaFlowFunctionMap.getCallToReturnFlowFunction(src.n, dest).getTargets(src.d).intIterator)
 
-  override def callFlowFunction(src: XNode, dest: Node)
-    = zipWithId(walaFlowFunctionMap.getCallFlowFunction())(src, dest)
+  override def callFlowFunction(src: XNode, dest: Node, ret: Node)
+    = zipWithId(walaFlowFunctionMap.getCallFlowFunction(src.n, dest, ret).getTargets(src.d).intIterator())
 
+  // todo add to IDE implementation!!!!!!!!!
   override def callNoneToReturnFlowFunction(src: XNode, dest: Node)
     = zipWithId(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(src.n, dest).getTargets(src.d).intIterator)
 
-  private[this] def zipWithId(intIterator: IntIterator) =
+  private[this] def zipWithId(intIterator: IntIterator): Iterable[FactFunPair] =
     intIteratorToScala(intIterator) map { FactFunPair(_, IfdsIdFunction) }
 
   private[this] def zipWithIdOther(f: IfdsOtherEdgeFn)(ideN1: XNode) =
