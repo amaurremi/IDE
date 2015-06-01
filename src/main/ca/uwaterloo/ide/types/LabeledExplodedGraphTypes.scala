@@ -66,4 +66,9 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
      */
     override def equals(obj: Any): Boolean
   }
+
+  /**
+   * The main method nodes that should be the entry points for the instance
+   */
+  val entryPoints: Seq[(XEdge, IdeFunction)]
 }

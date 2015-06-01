@@ -1,7 +1,6 @@
 package ca.uwaterloo.ide.solver
 
 import ca.uwaterloo.ide.problem.IdeProblem
-import ca.uwaterloo.ide.util.TraverseGraph
 
 import scala.collection.{breakOut, mutable}
 
@@ -19,10 +18,13 @@ trait ComputeValues { this: IdeProblem with TraverseGraph =>
   private[this] def initialize() {
     // [2]
     vals ++= (entryPoints map {
-      XNode(_, Λ) -> Bottom
+      case (XEdge(n, _), _) =>
+        n -> Bottom
     })(breakOut)
     // [3]
-    nodeWorklist ++= entryPoints map { XNode(_, Λ) }
+    nodeWorklist ++= entryPoints map {
+      case (XEdge(n, _), _) => n
+    }
   }
 
   def computeValues(jumpFunc: JumpFn): Map[XNode, LatticeElem]  = {

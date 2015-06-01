@@ -1,6 +1,6 @@
 package ca.uwaterloo.ide.problem
 
-import ca.uwaterloo.ide.types.{Phis, LabeledExplodedGraphTypes}
-import ca.uwaterloo.ide.util.TraverseGraph
+import ca.uwaterloo.ide.solver.TraverseGraph
+import ca.uwaterloo.ide.types.LabeledExplodedGraphTypes
 
-trait IdeProblem extends LabeledExplodedGraphTypes with IdeFlowFunctions with TraverseGraph with Phis
+trait IdeProblem extends LabeledExplodedGraphTypes with IdeFlowFunctions with TraverseGraph

@@ -1,10 +1,10 @@
 package ca.uwaterloo.ide.solver
 
 import ca.uwaterloo.ide.problem.IdeProblem
-import ca.uwaterloo.ide.util.TraverseGraph
 import com.ibm.wala.util.collections.HashSetMultiMap
 
 import scala.collection.JavaConverters._
+import scala.collection.generic.CanBuildFrom
 import scala.collection.{breakOut, mutable}
 
 // p. 147 of Sagiv, Reps, Horwitz, "Precise interprocedural dataflow instance
@@ -23,17 +23,9 @@ trait JumpFuncs {
   private[this] val forwardExitD4s = new ForwardExitD4s
 
   def initialize() {
-    // [5]
-    val edges = entryPoints map {
-      ep =>
-        val zeroNode = XNode(ep, Λ)
-        XEdge(zeroNode, zeroNode)
-    }
-    pathWorklist enqueue (edges: _*)
+    pathWorklist enqueue (entryPoints.unzip._1: _*)
     // [6]
-    jumpFn ++= (edges map {
-      _ -> Id
-    })(breakOut)
+    jumpFn ++= entryPoints
   }
 
   /**
@@ -79,7 +71,9 @@ trait JumpFuncs {
     // [14-16]
     for {
       r                       <- returnNodes(node)
-      FactFunPair(d3, edgeFn) <- callToReturnFlowFunction(n, r)
+      hasCallee                = targetStartNodes(node).nonEmpty
+      FactFunPair(d3, edgeFn) <- if (hasCallee) callToReturnFlowFunction(n, r)
+                                 else callNoneToReturnFlowFunction(n, r)
       rn                       = XNode(r, d3)
       re                       = XEdge(e.source, rn)
     } {

@@ -1,6 +1,6 @@
-package ca.uwaterloo.ide.util
+package ca.uwaterloo.ide.solver
 
-import ca.uwaterloo.ide.types.{ExplodedGraphTypes, Phis}
+import ca.uwaterloo.ide.types.ExplodedGraphTypes
 import com.ibm.wala.util.Predicate
 import com.ibm.wala.util.graph.traverse.DFS
 
@@ -8,7 +8,7 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-trait TraverseGraph { this: ExplodedGraphTypes with Phis =>
+trait TraverseGraph { this: ExplodedGraphTypes =>
 
   private[this] val followingNodesCache = mutable.Map[Node, Seq[Node]]()
 

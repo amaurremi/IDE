@@ -1,14 +1,17 @@
 package ca.uwaterloo.ide.conversion
 
 import ca.uwaterloo.ide.problem.IdeProblem
-import com.ibm.wala.dataflow.IFDS.{IBinaryReturnFlowFunction, IUnaryFlowFunction, IFlowFunction, TabulationProblem}
+import com.ibm.wala.dataflow.IFDS._
 import com.ibm.wala.util.intset.IntIterator
+
+import scala.collection.JavaConverters._
+import scala.collection.breakOut
 
 trait IdeFromIfdsBuilder extends IdeProblem {
 
-//  T = Node, P = Procedure
-  type Fact = Int
   type F
+  type Fact = Int
+
   val walaIfdsProblem: TabulationProblem[Node, Procedure, F]
 
   type IfdsEdgeFn      = (Node, Node) => Set[Fact]
@@ -44,7 +47,6 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   override def callFlowFunction(src: XNode, dest: Node, ret: Node)
     = zipWithId(walaFlowFunctionMap.getCallFlowFunction(src.n, dest, ret).getTargets(src.d).intIterator())
 
-  // todo add to IDE implementation!!!!!!!!!
   override def callNoneToReturnFlowFunction(src: XNode, dest: Node)
     = zipWithId(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(src.n, dest).getTargets(src.d).intIterator)
 
@@ -91,4 +93,14 @@ trait IdeFromIfdsBuilder extends IdeProblem {
     }
     set
   }
+
+  // todo check that this is the right assumption
+  override val Λ: Int = 0
+
+  override val entryPoints: Seq[(XEdge, IdeFunction)] = (walaIfdsProblem.initialSeeds().asScala map {
+    e: PathEdge[Node] =>
+      (XEdge(XNode(e.getEntry, e.getD1), XNode(e.getTarget, e.getD2)), Id)
+  })(breakOut)
+
+  override val supergraph: ISupergraph[Node, Procedure] = walaIfdsProblem.getSupergraph
 }
