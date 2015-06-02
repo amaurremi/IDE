@@ -26,13 +26,15 @@ public class ReachingDefsProblem implements
 
     private final ISupergraph<BasicBlockInContext<IExplodedBasicBlock>, CGNode> supergraph;
     private final ReachingDefsDomain domain = new ReachingDefsDomain();
+
     private final IClassHierarchy cha;
-    private ReachingDefsFlowFunctions flowFunctions = new ReachingDefsFlowFunctions(domain);
-    private Collection<PathEdge<BasicBlockInContext<IExplodedBasicBlock>>> initialSeeds = collectInitialSeeds();
+    private final ReachingDefsFlowFunctions flowFunctions = new ReachingDefsFlowFunctions(domain);
+    private final Collection<PathEdge<BasicBlockInContext<IExplodedBasicBlock>>> initialSeeds;
 
     public ReachingDefsProblem(CallGraph cg, AnalysisCache cache) {
         this.cha =  cg.getClassHierarchy();
         this.supergraph = ICFGSupergraph.make(cg, cache);
+        initialSeeds = collectInitialSeeds();
     }
 
     /**

@@ -28,33 +28,38 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   private[this] def walaFlowFunctionMap = walaIfdsProblem.getFunctionMap
 
   override def normalFlowFunction(src: XNode, dest: Node) =
-    zipWithId(walaFlowFunctionMap.getNormalFlowFunction(src.n, dest).getTargets(src.d).intIterator)
+    zipWithId(unaryIterator(walaFlowFunctionMap.getNormalFlowFunction(src.n, dest), src))
 
   override def returnFlowFunction(call: Node, src: XNode, dest: Node): ReturnFlowFunctionType = {
     walaFlowFunctionMap.getReturnFlowFunction(call, src.n, dest) match {
       case u: IUnaryFlowFunction        =>
-        UnaryReturnFlowFunction(zipWithId(u.getTargets(src.d).intIterator))
+        UnaryReturnFlowFunction(zipWithId(unaryIterator(u, src)))
       case b: IBinaryReturnFlowFunction =>
         BinaryReturnFlowFunction(
           d4 =>
-            zipWithId(b.getTargets(d4, src.d).intIterator))
+            zipWithId(binaryIterator(b, src, d4)))
     }
   }
 
   override def callToReturnFlowFunction(src: XNode, dest: Node)
-    = zipWithId(walaFlowFunctionMap.getCallToReturnFlowFunction(src.n, dest).getTargets(src.d).intIterator)
+    = zipWithId(unaryIterator(walaFlowFunctionMap.getCallToReturnFlowFunction(src.n, dest), src))
 
   override def callFlowFunction(src: XNode, dest: Node, ret: Node)
-    = zipWithId(walaFlowFunctionMap.getCallFlowFunction(src.n, dest, ret).getTargets(src.d).intIterator())
+    = zipWithId(unaryIterator(walaFlowFunctionMap.getCallFlowFunction(src.n, dest, ret), src))
 
   override def callNoneToReturnFlowFunction(src: XNode, dest: Node)
-    = zipWithId(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(src.n, dest).getTargets(src.d).intIterator)
+    = zipWithId(unaryIterator(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(src.n, dest), src))
 
-  private[this] def zipWithId(intIterator: IntIterator): Iterable[FactFunPair] =
-    intIteratorToScala(intIterator) map { FactFunPair(_, IfdsIdFunction) }
+  private[this] def unaryIterator(flowFunction: IUnaryFlowFunction, src: XNode) =
+    if (flowFunction == null) Seq()
+    else intIteratorToScala(flowFunction.getTargets(src.d).intIterator)
 
-  private[this] def zipWithIdOther(f: IfdsOtherEdgeFn)(ideN1: XNode) =
-    f(ideN1) map { FactFunPair(_, IfdsIdFunction) }
+  private[this] def binaryIterator(flowFunction: IBinaryReturnFlowFunction, src: XNode, d: Fact) =
+    if (flowFunction == null) Seq()
+    else intIteratorToScala(flowFunction.getTargets(d, src.d).intIterator)
+
+  private[this] def zipWithId(iterator: Iterable[Fact]): Iterable[FactFunPair] =
+    iterator map { FactFunPair(_, IfdsIdFunction) }
 
   trait IfdsLatticeElem extends Lattice[IfdsLatticeElem]
 
