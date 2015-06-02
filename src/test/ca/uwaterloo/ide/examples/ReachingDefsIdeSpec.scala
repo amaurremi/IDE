@@ -3,7 +3,6 @@ package ca.uwaterloo.ide.examples
 import java.io.ByteArrayInputStream
 
 import ca.uwaterloo.ide.conversion.IdeFromIfdsBuilder
-import ca.uwaterloo.ide.problem.solver.IdeSolver
 import ca.uwaterloo.ide.util.Time
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
