@@ -3,7 +3,7 @@ package ca.uwaterloo.ide.examples
 import java.io.ByteArrayInputStream
 
 import ca.uwaterloo.ide.conversion.IdeFromIfdsBuilder
-import ca.uwaterloo.ide.solver.IdeSolver
+import ca.uwaterloo.ide.problem.solver.IdeSolver
 import ca.uwaterloo.ide.util.Time
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
@@ -52,7 +52,7 @@ object ReachingDefsIdeSpec {
   }
 }
 
-class ReachingDefsIdeProblem(cg: CallGraph) extends IdeFromIfdsBuilder with IdeSolver {
+class ReachingDefsIdeProblem(cg: CallGraph) extends IdeFromIfdsBuilder {
 
   override type F = Pair[CGNode, Integer]
   override type Node = BasicBlockInContext[IExplodedBasicBlock]

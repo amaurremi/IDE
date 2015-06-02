@@ -2,7 +2,7 @@ package ca.uwaterloo.ide.conversion
 
 import ca.uwaterloo.ide.problem.IdeProblem
 import com.ibm.wala.dataflow.IFDS._
-import com.ibm.wala.util.intset.IntIterator
+import com.ibm.wala.util.intset.{SparseIntSet, IntSet, IntIterator}
 
 import scala.collection.JavaConverters._
 import scala.collection.breakOut
@@ -50,13 +50,21 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   override def callNoneToReturnFlowFunction(src: XNode, dest: Node)
     = zipWithId(unaryIterator(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(src.n, dest), src))
 
-  private[this] def unaryIterator(flowFunction: IUnaryFlowFunction, src: XNode) =
+  private[this] def unaryIterator(flowFunction: IUnaryFlowFunction, src: XNode): Iterable[Fact] =
     if (flowFunction == null) Seq()
-    else intIteratorToScala(flowFunction.getTargets(src.d).intIterator)
+    else {
+      val targets: IntSet = flowFunction.getTargets(src.d)
+      if (targets == null) Seq()
+      else intIteratorToScala(targets.intIterator)
+    }
 
-  private[this] def binaryIterator(flowFunction: IBinaryReturnFlowFunction, src: XNode, d: Fact) =
+  private[this] def binaryIterator(flowFunction: IBinaryReturnFlowFunction, src: XNode, d: Fact): Iterable[Fact] =
     if (flowFunction == null) Seq()
-    else intIteratorToScala(flowFunction.getTargets(d, src.d).intIterator)
+    else {
+      val targets: SparseIntSet = flowFunction.getTargets(d, src.d)
+      if (targets == null) Seq()
+      else intIteratorToScala(targets.intIterator)
+    }
 
   private[this] def zipWithId(iterator: Iterable[Fact]): Iterable[FactFunPair] =
     iterator map { FactFunPair(_, IfdsIdFunction) }

@@ -1,4 +1,4 @@
-package ca.uwaterloo.ide.solver
+package ca.uwaterloo.ide.problem.solver
 
 import ca.uwaterloo.ide.problem.IdeProblem
 import com.ibm.wala.util.collections.HashSetMultiMap

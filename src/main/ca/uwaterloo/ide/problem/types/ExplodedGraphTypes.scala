@@ -1,4 +1,4 @@
-package ca.uwaterloo.ide.types
+package ca.uwaterloo.ide.problem.types
 
 import com.ibm.wala.dataflow.IFDS.ISupergraph
 

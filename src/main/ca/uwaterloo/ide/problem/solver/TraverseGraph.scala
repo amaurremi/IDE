@@ -1,6 +1,6 @@
-package ca.uwaterloo.ide.solver
+package ca.uwaterloo.ide.problem.solver
 
-import ca.uwaterloo.ide.types.ExplodedGraphTypes
+import ca.uwaterloo.ide.problem.types.ExplodedGraphTypes
 import com.ibm.wala.util.Predicate
 import com.ibm.wala.util.graph.traverse.DFS
 

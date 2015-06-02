@@ -1,6 +1,6 @@
 package ca.uwaterloo.ide.problem
 
-import ca.uwaterloo.ide.types.LabeledExplodedGraphTypes
+import ca.uwaterloo.ide.problem.types.LabeledExplodedGraphTypes
 
 /**
  * Defines functions that, for an edge (n, d1) -> (m, d2),
