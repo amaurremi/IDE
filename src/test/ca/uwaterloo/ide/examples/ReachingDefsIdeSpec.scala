@@ -2,11 +2,12 @@ package ca.uwaterloo.ide.examples
 
 import java.io.ByteArrayInputStream
 
-import ca.uwaterloo.ide.conversion.IdeFromIfdsBuilder
+import ca.uwaterloo.ide.conversion.{IdeResultToIfdsResult, IdeFromIfdsBuilder}
+import ca.uwaterloo.ide.problem.solver.IdeSolver
 import ca.uwaterloo.ide.util.Time
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
-import com.ibm.wala.dataflow.IFDS.TabulationProblem
+import com.ibm.wala.dataflow.IFDS.{PartiallyBalancedTabulationSolver, TabulationProblem}
 import com.ibm.wala.examples.analysis.dataflow.DataflowTest
 import com.ibm.wala.ipa.callgraph._
 import com.ibm.wala.ipa.callgraph.impl.Util
@@ -19,12 +20,19 @@ import com.ibm.wala.util.config.{AnalysisScopeReader, FileOfClasses}
 object ReachingDefsIdeSpec {
 
   def main(args: Array[String]): Unit = {
-    val problem = Time.time("create problem") {
-      new ReachingDefsIdeProblem(cg)
+    val problem = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
+    val result = Time.time("compute result") {
+      problem.ideResultToIfdsResult
     }
-    val result  = Time.time("compute result") {
-      problem.solvedResult
+    val originalIfdsSolver = PartiallyBalancedTabulationSolver.createPartiallyBalancedTabulationSolver(new ReachingDefsProblem(cg, new AnalysisCache), null)
+    val originalResult = Time.time("original IFDS result") {
+      originalIfdsSolver.solve
     }
+
+    val mySize = result.getSupergraphNodesReached.size()
+    val originalSize = originalResult.getSupergraphNodesReached.size
+
+    printf("my size: %s\noriginal size: %s\n", mySize, originalSize)
   }
 
   private[this] val cg = {
@@ -51,13 +59,11 @@ object ReachingDefsIdeSpec {
   }
 }
 
-class ReachingDefsIdeProblem(cg: CallGraph) extends IdeFromIfdsBuilder {
+class ReachingDefsIdeProblem(cg: CallGraph) extends IdeFromIfdsBuilder with IdeSolver {
 
   override type F = Pair[CGNode, Integer]
   override type Node = BasicBlockInContext[IExplodedBasicBlock]
   override type Procedure = CGNode
-  override val walaIfdsProblem
-    : TabulationProblem[Node, Procedure, F]
+  override val walaIfdsProblem: TabulationProblem[Node, Procedure, F]
     = Time.time("reaching defs problem") { new ReachingDefsProblem(cg, new AnalysisCache) }
 }
-
