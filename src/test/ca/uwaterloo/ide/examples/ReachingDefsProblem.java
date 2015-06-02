@@ -1,4 +1,4 @@
-package ca.uwaterloo.idea.examples;
+package ca.uwaterloo.ide.examples;
 
 import com.ibm.wala.classLoader.IField;
 import com.ibm.wala.dataflow.IFDS.*;
