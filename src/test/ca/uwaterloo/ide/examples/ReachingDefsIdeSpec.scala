@@ -24,7 +24,7 @@ object ReachingDefsIdeSpec {
 
   private[this] val cg = {
     val scope = AnalysisScopeReader.readJavaScope(TestConstants.WALA_TESTDATA, null, classOf[DataflowTest].getClassLoader)
-    val cha = Time.time("create cha") { ClassHierarchy.make(scope) }
+    val cha = ClassHierarchy.make(scope)
     val entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha, "Ldataflow/StaticDataflow")
     val options: AnalysisOptions = CallGraphTestUtil.makeAnalysisOptions(scope, entrypoints)
     val builder: CallGraphBuilder = Util.makeZeroOneCFABuilder(options, new AnalysisCache, cha, scope)
