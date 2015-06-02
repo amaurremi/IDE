@@ -25,7 +25,7 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   override val Id: IdeFunction     = IfdsIdFunction
   override val λTop: IdeFunction   = IfdsTopFunction
 
-  private[this] val walaFlowFunctionMap = walaIfdsProblem.getFunctionMap
+  private[this] def walaFlowFunctionMap = walaIfdsProblem.getFunctionMap
 
   override def normalFlowFunction(src: XNode, dest: Node) =
     zipWithId(walaFlowFunctionMap.getNormalFlowFunction(src.n, dest).getTargets(src.d).intIterator)
@@ -97,10 +97,10 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   // todo check that this is the right assumption
   override val Λ: Int = 0
 
-  override val entryPoints: Seq[(XEdge, IdeFunction)] = (walaIfdsProblem.initialSeeds().asScala map {
+  override def entryPoints: Seq[(XEdge, IdeFunction)] = (walaIfdsProblem.initialSeeds().asScala map {
     e: PathEdge[Node] =>
       (XEdge(XNode(e.getEntry, e.getD1), XNode(e.getTarget, e.getD2)), Id)
   })(breakOut)
 
-  override val supergraph: ISupergraph[Node, Procedure] = walaIfdsProblem.getSupergraph
+  override def supergraph: ISupergraph[Node, Procedure] = walaIfdsProblem.getSupergraph
 }
