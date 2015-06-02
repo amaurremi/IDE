@@ -1,13 +1,13 @@
-package ca.uwaterloo.ide.examples
+package ca.uwaterloo.ide.examples.reachingDefs
 
 import java.io.ByteArrayInputStream
+import java.lang.Iterable
 
-import ca.uwaterloo.ide.conversion.{IdeResultToIfdsResult, IdeFromIfdsBuilder}
+import ca.uwaterloo.ide.conversion.{IdeFromIfdsBuilder, IdeResultToIfdsResult}
 import ca.uwaterloo.ide.problem.solver.IdeSolver
-import ca.uwaterloo.ide.util.Time
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
-import com.ibm.wala.dataflow.IFDS.{PartiallyBalancedTabulationSolver, TabulationProblem}
+import com.ibm.wala.dataflow.IFDS.{TabulationProblem, TabulationSolver}
 import com.ibm.wala.examples.analysis.dataflow.DataflowTest
 import com.ibm.wala.ipa.callgraph._
 import com.ibm.wala.ipa.callgraph.impl.Util
@@ -21,18 +21,16 @@ object ReachingDefsIdeSpec {
 
   def main(args: Array[String]): Unit = {
     val problem = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
-    val result = Time.time("compute result") {
-      problem.ideResultToIfdsResult
-    }
-    val originalIfdsSolver = PartiallyBalancedTabulationSolver.createPartiallyBalancedTabulationSolver(new ReachingDefsProblem(cg, new AnalysisCache), null)
-    val originalResult = Time.time("original IFDS result") {
-      originalIfdsSolver.solve
-    }
+    val result = problem.ideResultToIfdsResult
+    val size = result.getSupergraphNodesReached.size
 
-    val mySize = result.getSupergraphNodesReached.size()
+    println("my size: " + size)
+
+    val originalIfdsSolver = TabulationSolver.make(new ReachingDefsProblem(cg, new AnalysisCache))
+    val originalResult = originalIfdsSolver.solve
     val originalSize = originalResult.getSupergraphNodesReached.size
 
-    printf("my size: %s\noriginal size: %s\n", mySize, originalSize)
+    println("original size: " + originalSize)
   }
 
   private[this] val cg = {
@@ -52,7 +50,7 @@ object ReachingDefsIdeSpec {
         "java\\/security\\/.*\n"
     scope.setExclusions(new FileOfClasses(new ByteArrayInputStream(exclusions.getBytes("UTF-8"))))
     val cha = ClassHierarchy.make(scope)
-    val entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha, "Ldataflow/StaticDataflow")
+    val entrypoints: Iterable[Entrypoint] = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha, "Ldataflow/Simple")
     val options: AnalysisOptions = CallGraphTestUtil.makeAnalysisOptions(scope, entrypoints)
     val builder: CallGraphBuilder = Util.makeZeroOneCFABuilder(options, new AnalysisCache, cha, scope)
     builder.makeCallGraph(options, null)
@@ -64,6 +62,5 @@ class ReachingDefsIdeProblem(cg: CallGraph) extends IdeFromIfdsBuilder with IdeS
   override type F = Pair[CGNode, Integer]
   override type Node = BasicBlockInContext[IExplodedBasicBlock]
   override type Procedure = CGNode
-  override val walaIfdsProblem: TabulationProblem[Node, Procedure, F]
-    = Time.time("reaching defs problem") { new ReachingDefsProblem(cg, new AnalysisCache) }
+  override val walaIfdsProblem: TabulationProblem[Node, Procedure, F] = new ReachingDefsProblem(cg, new AnalysisCache)
 }

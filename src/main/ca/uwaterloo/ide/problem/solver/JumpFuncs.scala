@@ -59,9 +59,10 @@ trait JumpFuncs {
     val n = e.target
     // [12-13]
     val node = n.n
+    val targetNodes = targetStartNodes(node)
     for {
-      sq <- targetStartNodes(node)
-      r  <- returnNodes(node)
+      sq <- targetNodes
+      r  <- returnNodes(node, sq)
       d3 <- callStartD2s(n, sq, r)
     } {
       val sqn = XNode(sq, d3)
@@ -70,8 +71,9 @@ trait JumpFuncs {
     }
     // [14-16]
     for {
-      r                       <- returnNodes(node)
-      hasCallee                = targetStartNodes(node).nonEmpty
+      sq                      <- targetNodes
+      r                       <- returnNodes(node, sq)
+      hasCallee                = targetNodes.nonEmpty
       FactFunPair(d3, edgeFn) <- if (hasCallee) callToReturnFlowFunction(n, r)
                                  else callNoneToReturnFlowFunction(n, r)
       rn                       = XNode(r, d3)
@@ -86,23 +88,23 @@ trait JumpFuncs {
   }
 
   def forwardExitNodeSpecific(e: XEdge, f: IdeFunction, call: XNode, r: Node) = {
-    val sp = e.source
-    val c = call.n
-    val d4 = call.d
-    val returnPairs = returnFlowFunction(c, e.target, r) match {
-      case BinaryReturnFlowFunction(fun)   =>
-        fun(d4)
-      case UnaryReturnFlowFunction(ffps) =>
-        ffps
-    }
+    val sp           = e.source
+    val XNode(c, d4) = call
+    val returnPairs: Iterable[FactFunPair] =
+      returnFlowFunction(c, e.target, r) match {
+        case BinaryReturnFlowFunction(fun)   =>
+          fun(d4)
+        case UnaryReturnFlowFunction(ffps) =>
+          ffps
+      }
     for {
-      FactFunPair(d1, f4) <- callFlowFunction(XNode(c, d4), sp.n, r)
+      FactFunPair(d1, f4) <- callFlowFunction(call, sp.n, r)
       if sp.d == d1
       FactFunPair(d5, f5) <- returnPairs
-      rn = XNode(r, d5)
-      sumEdge = XEdge(XNode(c, d4), rn)
-      sumF = summaryFn(sumEdge)
-      fPrime = (f5 ◦ f ◦ f4) ⊓ sumF
+      rn                   = XNode(r, d5)
+      sumEdge              = XEdge(call, rn)
+      sumF                 = summaryFn(sumEdge)
+      fPrime               = (f5 ◦ f ◦ f4) ⊓ sumF
       if fPrime != sumF
     } {
       // [26]

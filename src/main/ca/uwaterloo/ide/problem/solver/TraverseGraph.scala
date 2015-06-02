@@ -34,12 +34,10 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
     (supergraph getCalledNodes n).asScala
 
   /**
-   * Return-site nodes that correspond to call node n
+   * Return-site nodes that correspond to call node n to target start node s
    */
-  def returnNodes(n: Node): Iterator[Node] =
-    targetStartNodes(n) flatMap { s =>
-      supergraph.getReturnSites(n, enclProc(s)).asScala
-    }
+  def returnNodes(n: Node, s: Node): Iterator[Node] =
+    supergraph.getReturnSites(n, enclProc(s)).asScala
 
   /**
    * Returns the start node of the node's enclosing procedure.
@@ -58,7 +56,7 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
       r <- followingNodes(exit)
       rn = r
       c <- getCallSites(rn, enclProc(exit))
-      if (supergraph getSuccNodes c).asScala contains rn
+      if followingNodes(c) contains rn
     } yield c -> r
 
   def getCallSites(node: Node, proc: Procedure): Iterator[Node] =

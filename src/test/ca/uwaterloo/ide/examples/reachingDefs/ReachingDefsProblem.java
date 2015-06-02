@@ -1,4 +1,4 @@
-package ca.uwaterloo.ide.examples;
+package ca.uwaterloo.ide.examples.reachingDefs;
 
 import com.ibm.wala.classLoader.IField;
 import com.ibm.wala.dataflow.IFDS.*;
