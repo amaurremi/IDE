@@ -147,7 +147,7 @@ trait JumpFuncs {
     forwardExitD4s.put(call.n, sq, call.d)
     for {
       (e2, f2) <- forwardExitD4s.getQueried(call.n, sq.n)
-      r        <- returnNodes(call.n)
+      r        <- returnNodes(call.n, sq.n)
     } {
       forwardExitNodeSpecific(e2, f2, call, r)
     }
