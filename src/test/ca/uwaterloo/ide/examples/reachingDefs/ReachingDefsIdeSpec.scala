@@ -17,20 +17,34 @@ import com.ibm.wala.ssa.analysis.IExplodedBasicBlock
 import com.ibm.wala.util.collections.Pair
 import com.ibm.wala.util.config.{AnalysisScopeReader, FileOfClasses}
 
+import scala.collection.JavaConverters._
+
 object ReachingDefsIdeSpec {
 
   def main(args: Array[String]): Unit = {
     val problem = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
     val result = problem.ideResultToIfdsResult
-    val size = result.getSupergraphNodesReached.size
+    val ideNodesReached = result.getSupergraphNodesReached.asScala.toSet
 
-    println("my size: " + size)
+    println("IDE size: " + ideNodesReached.size)
 
     val originalIfdsSolver = TabulationSolver.make(new ReachingDefsProblem(cg, new AnalysisCache))
     val originalResult = originalIfdsSolver.solve
-    val originalSize = originalResult.getSupergraphNodesReached.size
+    val ifdsNodesReached = originalResult.getSupergraphNodesReached.asScala.toSet
 
-    println("original size: " + originalSize)
+    println("IFDS size: " + ifdsNodesReached.size)
+
+    println("\ncontained in IFDS but not in IDE:")
+    ifdsNodesReached diff ideNodesReached foreach {
+      n =>
+        println(n)
+    }
+
+    println("\ncontained in IDE but not in IFDS:")
+    ideNodesReached diff ifdsNodesReached foreach {
+      n =>
+        println(n)
+    }
   }
 
   private[this] val cg = {

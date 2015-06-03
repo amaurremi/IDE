@@ -110,8 +110,8 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   // todo check that this is the right assumption
   override val Λ: Int = 0
 
-  override def entryPoints: Seq[(XEdge, IdeFunction)] = (walaIfdsProblem.initialSeeds().asScala map {
-    e: PathEdge[Node] =>
+  override def initialSeeds: Seq[(XEdge, IdeFunction)] = (walaIfdsProblem.initialSeeds().asScala map {
+    e: PathEdge[Node] => 
       (XEdge(XNode(e.getEntry, e.getD1), XNode(e.getTarget, e.getD2)), Id)
   })(breakOut)
 

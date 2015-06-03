@@ -23,9 +23,9 @@ trait JumpFuncs {
   private[this] val forwardExitD4s = new ForwardExitD4s
 
   def initialize() {
-    pathWorklist enqueue (entryPoints.unzip._1: _*)
+    pathWorklist enqueue (initialSeeds.unzip._1: _*)
     // [6]
-    jumpFn ++= entryPoints
+    jumpFn ++= initialSeeds
   }
 
   /**

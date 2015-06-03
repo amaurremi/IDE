@@ -17,12 +17,12 @@ trait ComputeValues { this: IdeProblem with TraverseGraph =>
 
   private[this] def initialize() {
     // [2]
-    vals ++= (entryPoints map {
+    vals ++= (initialSeeds map {
       case (XEdge(n, _), _) =>
         n -> Bottom
     })(breakOut)
     // [3]
-    nodeWorklist ++= entryPoints map {
+    nodeWorklist ++= initialSeeds map {
       case (XEdge(n, _), _) => n
     }
   }
