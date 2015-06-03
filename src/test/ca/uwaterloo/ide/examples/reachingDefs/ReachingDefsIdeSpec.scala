@@ -22,15 +22,15 @@ import scala.collection.JavaConverters._
 object ReachingDefsIdeSpec {
 
   def main(args: Array[String]): Unit = {
-    val problem = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
-    val result = problem.ideResultToIfdsResult
+    val problem         = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
+    val result          = problem.ideResultToIfdsResult
     val ideNodesReached = result.getSupergraphNodesReached.asScala.toSet
 
     println("IDE size: " + ideNodesReached.size)
 
     val originalIfdsSolver = TabulationSolver.make(new ReachingDefsProblem(cg, new AnalysisCache))
-    val originalResult = originalIfdsSolver.solve
-    val ifdsNodesReached = originalResult.getSupergraphNodesReached.asScala.toSet
+    val originalResult     = originalIfdsSolver.solve
+    val ifdsNodesReached   = originalResult.getSupergraphNodesReached.asScala.toSet
 
     println("IFDS size: " + ifdsNodesReached.size)
 

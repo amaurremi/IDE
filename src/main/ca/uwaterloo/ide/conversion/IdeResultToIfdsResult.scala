@@ -35,6 +35,7 @@ trait IdeResultToIfdsResult extends IdeFromIfdsBuilder with IdeSolver {
       override def getSupergraphNodesReached: util.Collection[Node] =
         (for {
           (XNode(n, f), l) <- solvedResult
+//          if f != Λ // todo apparently in WALA's IFDS implementation there's no 0 fact
           if l != Top
         } yield n).toSeq.asJava
 

@@ -30,18 +30,18 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
   /**
    * Given a call node n, returns the start nodes of n's target procedures.
    */
-  def targetStartNodes(n: Node): Iterator[Node] =
-    (supergraph getCalledNodes n).asScala
+  def targetStartNodes(n: Node): Iterable[Node] =
+    (supergraph getCalledNodes n).asScala.toIterable
 
   /**
    * Return-site nodes that correspond to call node n to target start node s
    */
-  def returnNodes(n: Node, s: Option[Node]): Iterator[Node] = {
+  def returnNodes(n: Node, s: Option[Node]): Iterable[Node] = {
     val proc = s match {
       case Some(sn) => enclProc(sn)
       case None     => null.asInstanceOf[Procedure]
     }
-    supergraph.getReturnSites(n, proc).asScala
+    supergraph.getReturnSites(n, proc).asScala.toIterable
   }
 
   /**
@@ -64,8 +64,8 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
       if followingNodes(c) contains rn
     } yield c -> r
 
-  def getCallSites(node: Node, proc: Procedure): Iterator[Node] =
-    supergraph.getCallSites(node, proc).asScala
+  def getCallSites(node: Node, proc: Procedure): Iterable[Node] =
+    supergraph.getCallSites(node, proc).asScala.toIterable
 
   /**
    * All call nodes inside of a given procedure

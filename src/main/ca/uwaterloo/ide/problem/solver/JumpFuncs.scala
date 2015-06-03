@@ -82,8 +82,9 @@ trait JumpFuncs {
   private[this] def forwardCallReturn(e: XEdge, sq: Option[Node], f: IdeFunction) = {
     val n = e.target
     for {
-      r                       <- returnNodes(n.n, sq) // todo I think just having None is incorrect
-      FactFunPair(d3, edgeFn) <- callNoneToReturnFlowFunction(n, r)
+      r                       <- returnNodes(n.n, sq)
+      FactFunPair(d3, edgeFn) <- if (sq.isDefined) callToReturnFlowFunction(n, r)
+                                 else callNoneToReturnFlowFunction(n, r)
       rn                       = XNode(r, d3)
       re                       = XEdge(e.source, rn)
     } {
