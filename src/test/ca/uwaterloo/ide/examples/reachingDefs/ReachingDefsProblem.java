@@ -63,7 +63,7 @@ public class ReachingDefsProblem implements
         for (BasicBlockInContext<IExplodedBasicBlock> bb : supergraph) {
             IExplodedBasicBlock ebb = bb.getDelegate();
             SSAInstruction instruction = ebb.getInstruction();
-            if (instruction instanceof SSAPutInstruction) {
+            if (instruction instanceof SSAPutInstruction && bb.getMethod().getName().toString().contains("main")) {
                 SSAPutInstruction putInstr = (SSAPutInstruction) instruction;
                 if (putInstr.isStatic()) {
                     final CGNode cgNode = bb.getNode();

@@ -36,8 +36,13 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
   /**
    * Return-site nodes that correspond to call node n to target start node s
    */
-  def returnNodes(n: Node, s: Node): Iterator[Node] =
-    supergraph.getReturnSites(n, enclProc(s)).asScala
+  def returnNodes(n: Node, s: Option[Node]): Iterator[Node] = {
+    val proc = s match {
+      case Some(sn) => enclProc(sn)
+      case None     => null.asInstanceOf[Procedure]
+    }
+    supergraph.getReturnSites(n, proc).asScala
+  }
 
   /**
    * Returns the start node of the node's enclosing procedure.

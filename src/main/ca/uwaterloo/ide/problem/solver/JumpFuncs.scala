@@ -62,7 +62,7 @@ trait JumpFuncs {
     val targetNodes = targetStartNodes(node)
     for {
       sq <- targetNodes
-      r  <- returnNodes(node, sq)
+      r  <- returnNodes(node, Some(sq))
       d3 <- callStartD2s(n, sq, r)
     } {
       val sqn = XNode(sq, d3)
@@ -70,12 +70,20 @@ trait JumpFuncs {
       forwardExitFromCall(n, f, sqn)
     }
     // [14-16]
+    if (targetNodes.isEmpty)
+      forwardCallReturn(e, None, f)
+    else
+      targetNodes foreach {
+        sq =>
+          forwardCallReturn(e, Some(sq), f)
+      }
+  }
+
+  private[this] def forwardCallReturn(e: XEdge, sq: Option[Node], f: IdeFunction) = {
+    val n = e.target
     for {
-      sq                      <- targetNodes
-      r                       <- returnNodes(node, sq)
-      hasCallee                = targetNodes.nonEmpty
-      FactFunPair(d3, edgeFn) <- if (hasCallee) callToReturnFlowFunction(n, r)
-                                 else callNoneToReturnFlowFunction(n, r)
+      r                       <- returnNodes(n.n, sq) // todo I think just having None is incorrect
+      FactFunPair(d3, edgeFn) <- callNoneToReturnFlowFunction(n, r)
       rn                       = XNode(r, d3)
       re                       = XEdge(e.source, rn)
     } {
@@ -147,7 +155,7 @@ trait JumpFuncs {
     forwardExitD4s.put(call.n, sq, call.d)
     for {
       (e2, f2) <- forwardExitD4s.getQueried(call.n, sq.n)
-      r        <- returnNodes(call.n, sq.n)
+      r        <- returnNodes(call.n, Some(sq.n))
     } {
       forwardExitNodeSpecific(e2, f2, call, r)
     }

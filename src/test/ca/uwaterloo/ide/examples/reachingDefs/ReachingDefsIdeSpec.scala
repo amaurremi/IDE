@@ -35,7 +35,8 @@ object ReachingDefsIdeSpec {
     println("IFDS size: " + ifdsNodesReached.size)
 
     println("\ncontained in IFDS but not in IDE:")
-    ifdsNodesReached diff ideNodesReached foreach {
+    val ifdsNotIde = ifdsNodesReached diff ideNodesReached
+    ifdsNotIde foreach {
       n =>
         println(n)
     }
