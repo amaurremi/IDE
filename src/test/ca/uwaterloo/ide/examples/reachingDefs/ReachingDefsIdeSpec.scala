@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream
 import java.lang.Iterable
 
 import ca.uwaterloo.ide.conversion.{IdeFromIfdsBuilder, IdeResultToIfdsResult}
-import ca.uwaterloo.ide.problem.solver.IdeSolver
+import ca.uwaterloo.ide.problem.solver.{PartiallyBalancedPropagator, IdeSolver}
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
 import com.ibm.wala.dataflow.IFDS.{TabulationProblem, TabulationSolver}
@@ -72,7 +72,7 @@ object ReachingDefsIdeSpec {
   }
 }
 
-class ReachingDefsIdeProblem(cg: CallGraph) extends IdeFromIfdsBuilder with IdeSolver {
+class ReachingDefsIdeProblem(cg: CallGraph) extends IdeFromIfdsBuilder with IdeSolver with PartiallyBalancedPropagator {
 
   override type F = Pair[CGNode, Integer]
   override type Node = BasicBlockInContext[IExplodedBasicBlock]

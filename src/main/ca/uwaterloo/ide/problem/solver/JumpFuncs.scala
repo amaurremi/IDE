@@ -10,15 +10,10 @@ import scala.collection.{breakOut, mutable}
 // p. 147 of Sagiv, Reps, Horwitz, "Precise interprocedural dataflow instance
 // with applications to constant propagation"
 trait JumpFuncs {
-  this: IdeProblem with TraverseGraph =>
-
-  private[this] val pathWorklist = new mutable.Queue[XEdge]
-
-  // [1-2]
-  private[this] val jumpFn = mutable.Map[XEdge, IdeFunction]() withDefault { _ => λTop} // for some reason, withDefalutValue doesn't work
+  this: IdeProblem with TraverseGraph with PropagatorI =>
 
   // [3-4]
-  private[this] val summaryFn = mutable.Map[XEdge, IdeFunction]() withDefault { _ => λTop}
+  private[this] val summaryFn = mutable.Map[XEdge, IdeFunction]() withDefault { _ => λTop }
 
   private[this] val forwardExitD4s = new ForwardExitD4s
 
@@ -27,12 +22,6 @@ trait JumpFuncs {
     // [6]
     jumpFn ++= initialSeeds
   }
-
-  /**
-   * Maps (sq, c, d4) to (d3, jumpFn) if JumpFn(sq, d3 -> c, d4) != Top
-   * [28]
-   */
-  private[this] val forwardExitD3s = new HashSetMultiMap[(Node, XNode), (Fact, IdeFunction)]
 
   def computeJumpFuncs: Map[XEdge, IdeFunction] = {
     initialize()
@@ -162,14 +151,6 @@ trait JumpFuncs {
     }
   }
 
-  /**
-   * For line [28], we need to retrieve all d3 values that match the condition. When we encounter
-   * them here, we store them in the forwardExitD3s map.
-   */
-  private[this] def forwardExitFromPropagate(e: XEdge, f2: IdeFunction) {
-    forwardExitD3s.put((e.source.n, e.target), (e.source.d, f2))
-  }
-
   private[this] def forwardAnyNode(e: XEdge, f: IdeFunction) {
     val n = e.target
     for {
@@ -177,16 +158,6 @@ trait JumpFuncs {
       FactFunPair(d3, edgeFn) <- normalFlowFunction(n, m)
     } {
       propagate(XEdge(e.source, XNode(m, d3)), edgeFn ◦ f)
-    }
-  }
-
-  private[this] def propagate(e: XEdge, f: IdeFunction) {
-    val jf = jumpFn(e)
-    val f2 = f ⊓ jf
-    if (f2 != jf) {
-      jumpFn += e -> f2
-      if (f2 != λTop) forwardExitFromPropagate(e, f2)
-      pathWorklist enqueue e
     }
   }
 
