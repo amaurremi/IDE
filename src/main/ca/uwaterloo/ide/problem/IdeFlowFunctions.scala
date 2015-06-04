@@ -59,7 +59,7 @@ trait PartiallyBalancedIdeFlowFunctions extends IdeFlowFunctions {
    * This version should work when the "call" instruction was never reached normally. This applies only when using partially
    * balanced parentheses.
    */
-  def unbalancedReturnFlowFunction(src: XNode, dest: Node)
+  def unbalancedReturnFlowFunction(src: XNode, dest: Node): Iterable[FactFunPair]
 
   /**
    * The entry node that should be used as the start node of the jump function to n. This node

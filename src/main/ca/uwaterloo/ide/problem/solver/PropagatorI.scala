@@ -59,7 +59,7 @@ trait PartiallyBalancedPropagator extends PropagatorI with TraverseGraph { this:
     unbalancedSeeds.contains(e.source)
 
   private[this] val unbalancedSeeds = mutable.Set[XNode](initialSeeds map {
-    _.edge.source
+    _._1.source
   }: _*)
 
   def propagate(e: XEdge, f: IdeFunction) {

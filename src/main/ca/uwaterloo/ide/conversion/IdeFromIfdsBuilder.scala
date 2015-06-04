@@ -12,7 +12,7 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   type F
   type Fact = Int
 
-  val walaIfdsProblem: TabulationProblem[Node, Procedure, F]
+  def walaIfdsProblem: TabulationProblem[Node, Procedure, F]
 
   type IfdsEdgeFn      = (Node, Node) => Set[Fact]
   type IfdsOtherEdgeFn = XNode => Set[Fact]
@@ -50,7 +50,7 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   override def callNoneToReturnFlowFunction(src: XNode, dest: Node)
     = zipWithId(unaryIterator(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(src.n, dest), src))
 
-  private[this] def unaryIterator(flowFunction: IUnaryFlowFunction, src: XNode): Iterable[Fact] =
+  def unaryIterator(flowFunction: IUnaryFlowFunction, src: XNode): Iterable[Fact] =
     if (flowFunction == null) Seq()
     else {
       val targets: IntSet = flowFunction.getTargets(src.d)
@@ -66,7 +66,7 @@ trait IdeFromIfdsBuilder extends IdeProblem {
       else intIteratorToScala(targets.intIterator)
     }
 
-  private[this] def zipWithId(iterator: Iterable[Fact]): Iterable[FactFunPair] =
+  def zipWithId(iterator: Iterable[Fact]): Iterable[FactFunPair] =
     iterator map { FactFunPair(_, IfdsIdFunction) }
 
   trait IfdsLatticeElem extends Lattice[IfdsLatticeElem]

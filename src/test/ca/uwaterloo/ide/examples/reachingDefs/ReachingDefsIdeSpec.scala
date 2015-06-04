@@ -3,11 +3,11 @@ package ca.uwaterloo.ide.examples.reachingDefs
 import java.io.ByteArrayInputStream
 import java.lang.Iterable
 
-import ca.uwaterloo.ide.conversion.{IdeFromIfdsBuilder, IdeResultToIfdsResult}
-import ca.uwaterloo.ide.problem.solver.{PartiallyBalancedPropagator, IdeSolver}
+import ca.uwaterloo.ide.conversion.{IdeResultToIfdsResult, PartiallyBalancedIdeFromIfdsBuilder}
+import ca.uwaterloo.ide.problem.solver.IdeSolver
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
-import com.ibm.wala.dataflow.IFDS.{TabulationProblem, TabulationSolver}
+import com.ibm.wala.dataflow.IFDS.PartiallyBalancedTabulationSolver
 import com.ibm.wala.examples.analysis.dataflow.DataflowTest
 import com.ibm.wala.ipa.callgraph._
 import com.ibm.wala.ipa.callgraph.impl.Util
@@ -22,17 +22,17 @@ import scala.collection.JavaConverters._
 object ReachingDefsIdeSpec {
 
   def main(args: Array[String]): Unit = {
+    val originalIfdsSolver = PartiallyBalancedTabulationSolver.createPartiallyBalancedTabulationSolver(new ReachingDefsProblem(cg, new AnalysisCache), null)
+    val originalResult     = originalIfdsSolver.solve
+    val ifdsNodesReached   = originalResult.getSupergraphNodesReached.asScala.toSet
+
+    println("IFDS size: " + ifdsNodesReached.size)
+
     val problem         = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
     val result          = problem.ideResultToIfdsResult
     val ideNodesReached = result.getSupergraphNodesReached.asScala.toSet
 
     println("IDE size: " + ideNodesReached.size)
-
-    val originalIfdsSolver = TabulationSolver.make(new ReachingDefsProblem(cg, new AnalysisCache))
-    val originalResult     = originalIfdsSolver.solve
-    val ifdsNodesReached   = originalResult.getSupergraphNodesReached.asScala.toSet
-
-    println("IFDS size: " + ifdsNodesReached.size)
 
     println("\ncontained in IFDS but not in IDE:")
     val ifdsNotIde = ifdsNodesReached diff ideNodesReached
@@ -72,10 +72,12 @@ object ReachingDefsIdeSpec {
   }
 }
 
-class ReachingDefsIdeProblem(cg: CallGraph) extends IdeFromIfdsBuilder with IdeSolver with PartiallyBalancedPropagator {
-
+class ReachingDefsIdeProblem(cg: CallGraph)
+  extends PartiallyBalancedIdeFromIfdsBuilder
+  with IdeSolver
+{
   override type F = Pair[CGNode, Integer]
   override type Node = BasicBlockInContext[IExplodedBasicBlock]
   override type Procedure = CGNode
-  override val walaIfdsProblem: TabulationProblem[Node, Procedure, F] = new ReachingDefsProblem(cg, new AnalysisCache)
+  override def walaIfdsProblem = new ReachingDefsProblem(cg, new AnalysisCache)
 }

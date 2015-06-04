@@ -72,5 +72,5 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
   /**
    * The main method nodes that should be the entry points for the instance
    */
-  def initialSeeds: Seq[Seed]
+  def initialSeeds: Seq[(XEdge, IdeFunction)]
 }
