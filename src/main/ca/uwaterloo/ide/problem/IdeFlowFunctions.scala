@@ -7,7 +7,7 @@ import ca.uwaterloo.ide.problem.types.LabeledExplodedGraphTypes
  * for which we know n, d1, and m, return all
  * d2s plus the corresponding edge IDE functions.
  */
-trait IdeFlowFunctions { this: LabeledExplodedGraphTypes =>
+trait IdeFlowFunctions extends LabeledExplodedGraphTypes {
 
   case class FactFunPair(
     d2: Fact,
@@ -51,4 +51,19 @@ trait IdeFlowFunctions { this: LabeledExplodedGraphTypes =>
       callFlowFunction(node1, n2, ret) map { _.d2 }
 
   final val idFactFunPairSet = (d: Fact) => Set(FactFunPair(d, Id))
+}
+
+trait PartiallyBalancedIdeFlowFunctions extends IdeFlowFunctions {
+  
+  /**
+   * This version should work when the "call" instruction was never reached normally. This applies only when using partially
+   * balanced parentheses.
+   */
+  def unbalancedReturnFlowFunction(src: XNode, dest: Node)
+
+  /**
+   * The entry node that should be used as the start node of the jump function to n. This node
+   * must be the entry node of the procedure containing n
+   */
+  def fakeEntry(n: Node): Node
 }

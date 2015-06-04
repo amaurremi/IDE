@@ -67,8 +67,10 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
     override def equals(obj: Any): Boolean
   }
 
+  case class Seed(edge: XEdge, f: IdeFunction)
+
   /**
    * The main method nodes that should be the entry points for the instance
    */
-  def initialSeeds: Seq[(XEdge, IdeFunction)]
+  def initialSeeds: Seq[Seed]
 }

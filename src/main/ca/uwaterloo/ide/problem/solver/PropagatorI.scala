@@ -1,7 +1,11 @@
 package ca.uwaterloo.ide.problem.solver
 
+import ca.uwaterloo.ide.problem.PartiallyBalancedIdeFlowFunctions
 import ca.uwaterloo.ide.problem.types.LabeledExplodedGraphTypes
+import com.ibm.wala.dataflow.IFDS.{PartiallyBalancedTabulationProblem, PathEdge, IUnaryFlowFunction, IFlowFunction}
 import com.ibm.wala.util.collections.HashSetMultiMap
+import com.ibm.wala.util.debug.Assertions
+import com.ibm.wala.util.intset.{IntIterator, IntSet}
 
 import scala.collection.mutable
 
@@ -21,6 +25,21 @@ trait PropagatorI extends LabeledExplodedGraphTypes {
   def propagate(e: XEdge, f: IdeFunction)
 
   /**
+   * returns:
+   * jumpFn(e) != f ⊓ jumpFn(e)
+   */
+  def balancedPropagate(e: XEdge, f: IdeFunction): Boolean = {
+    val jf = jumpFn(e)
+    val f2 = f ⊓ jf
+    if (f2 != jf) {
+      jumpFn += e -> f2
+      if (f2 != λTop) forwardExitFromPropagate(e, f2)
+      pathWorklist enqueue e
+      true
+    } else false
+  }
+
+  /**
    * For line [28], we need to retrieve all d3 values that match the condition. When we encounter
    * them here, we store them in the forwardExitD3s map.
    */
@@ -31,27 +50,32 @@ trait PropagatorI extends LabeledExplodedGraphTypes {
 
 trait BalancedPropagator extends PropagatorI {
 
-  def propagate(e: XEdge, f: IdeFunction) {
-    val jf = jumpFn(e)
-    val f2 = f ⊓ jf
-    if (f2 != jf) {
-      jumpFn += e -> f2
-      if (f2 != λTop) forwardExitFromPropagate(e, f2)
-      pathWorklist enqueue e
-    }
-  }
+  def propagate(e: XEdge, f: IdeFunction) = balancedPropagate(e, f)
 }
 
-trait PartiallyBalancedPropagator extends PropagatorI {
+trait PartiallyBalancedPropagator extends PropagatorI with TraverseGraph { this: PartiallyBalancedIdeFlowFunctions =>
 
-  // todo make unblanced
+  private[this] def wasUsedAsUnbalancedSeed(e: XEdge): Boolean =
+    unbalancedSeeds.contains(e.source)
+
+  private[this] val unbalancedSeeds = mutable.Set[XNode](initialSeeds map {
+    _.edge.source
+  }: _*)
+
   def propagate(e: XEdge, f: IdeFunction) {
-    val jf = jumpFn(e)
-    val f2 = f ⊓ jf
-    if (f2 != jf) {
-      jumpFn += e -> f2
-      if (f2 != λTop) forwardExitFromPropagate(e, f2)
-      pathWorklist enqueue e
+    val n = e.target
+    if (balancedPropagate(e, f) && wasUsedAsUnbalancedSeed(e) && n.isExitNode) {
+      // e.target.d was reached from an entry seed. the facts that are reachable from that e.target.d
+      // will be used as the new seeds
+      for {
+        r                 <- followingNodes(n.n)
+        FactFunPair(d, f) <- unbalancedReturnFlowFunction(n, r)
+        entry              = fakeEntry(r)
+        s                  = XNode(entry, d)
+      } {
+        unbalancedSeeds add s
+        propagate(XEdge(s, XNode(r, d)), f)
+      }
     }
   }
 }
