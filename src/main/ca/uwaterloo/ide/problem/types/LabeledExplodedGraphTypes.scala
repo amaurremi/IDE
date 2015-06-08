@@ -3,19 +3,19 @@ package ca.uwaterloo.ide.problem.types
 trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
 
   /**
-   * The type for IDE functions that correspond to the edges in the exploded supergraph
+   * The type for micro functions that correspond to the edges in the exploded supergraph
    */
-  type IdeFunction <: IdeFunctionI
+  type MicroFunction <: MicroFunctionI
 
   /**
    * Represents λl.⊤
    */
-  val λTop: IdeFunction
+  val λTop: MicroFunction
 
   /**
    * Represents λl.l
    */
-  val Id: IdeFunction
+  val Id: MicroFunction
 
   /**
    * The type for a lattice element for the set L
@@ -47,19 +47,19 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
   /**
    * An IDE function that corresponds to an edge in the exploded supergraph
    */
-  trait IdeFunctionI {
+  trait MicroFunctionI {
 
     def apply(arg: LatticeElem): LatticeElem
 
     /**
      * Meet operator
      */
-    def ⊓(f: IdeFunction): IdeFunction
+    def ⊓(f: MicroFunction): MicroFunction
 
     /**
      * Compose operator
      */
-    def ◦(f: IdeFunction): IdeFunction
+    def ◦(f: MicroFunction): MicroFunction
 
     /**
      * It's necessary to implement the equals method on IDE functions.
@@ -67,10 +67,10 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
     override def equals(obj: Any): Boolean
   }
 
-  case class Seed(edge: XEdge, f: IdeFunction)
+  case class Seed(edge: XEdge, f: MicroFunction)
 
   /**
    * The main method nodes that should be the entry points for the instance
    */
-  def initialSeeds: Seq[(XEdge, IdeFunction)]
+  def initialSeeds: Seq[(XEdge, MicroFunction)]
 }

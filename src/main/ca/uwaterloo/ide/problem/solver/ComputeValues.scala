@@ -8,7 +8,7 @@ import scala.collection.{breakOut, mutable}
 // with applications to constant propagation"
 trait ComputeValues { this: IdeProblem with TraverseGraph =>
 
-  private[this] type JumpFn = Map[XEdge, IdeFunction]
+  private[this] type JumpFn = Map[XEdge, MicroFunction]
 
   // [1]
   private[this] val vals = mutable.Map[XNode, LatticeElem]() withDefault { _ => Top }

@@ -11,7 +11,7 @@ trait IdeFlowFunctions extends LabeledExplodedGraphTypes {
 
   case class FactFunPair(
     d2: Fact,
-    edgeFn: IdeFunction
+    edgeFn: MicroFunction
   )
 
   // todo documentation

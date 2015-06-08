@@ -1,4 +1,4 @@
-package ca.uwaterloo.ide.examples.reachingDefs
+package ca.uwaterloo.ide.example.reachingDefs
 
 import java.io.ByteArrayInputStream
 import java.lang.Iterable

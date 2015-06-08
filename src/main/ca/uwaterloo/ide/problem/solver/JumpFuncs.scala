@@ -13,7 +13,7 @@ trait JumpFuncs {
   this: IdeProblem with TraverseGraph with PropagatorI =>
 
   // [3-4]
-  private[this] val summaryFn = mutable.Map[XEdge, IdeFunction]() withDefault { _ => λTop }
+  private[this] val summaryFn = mutable.Map[XEdge, MicroFunction]() withDefault { _ => λTop }
 
   private[this] val forwardExitD4s = new ForwardExitD4s
 
@@ -23,7 +23,7 @@ trait JumpFuncs {
     jumpFn ++= initialSeeds
   }
 
-  def computeJumpFuncs: Map[XEdge, IdeFunction] = {
+  def computeJumpFuncs: Map[XEdge, MicroFunction] = {
     initialize()
     // [7-33]
     while (pathWorklist.nonEmpty) {
@@ -44,7 +44,7 @@ trait JumpFuncs {
   /**
    * p. 147, [11-18]
    */
-  private[this] def forwardCallNode(e: XEdge, f: IdeFunction) {
+  private[this] def forwardCallNode(e: XEdge, f: MicroFunction) {
     val n = e.target
     // [12-13]
     val node = n.n
@@ -68,7 +68,7 @@ trait JumpFuncs {
       }
   }
 
-  private[this] def forwardCallReturn(e: XEdge, sq: Option[Node], f: IdeFunction) = {
+  private[this] def forwardCallReturn(e: XEdge, sq: Option[Node], f: MicroFunction) = {
     val n = e.target
     for {
       r                       <- returnNodes(n.n, sq)
@@ -85,7 +85,7 @@ trait JumpFuncs {
     }
   }
 
-  def forwardExitNodeSpecific(e: XEdge, f: IdeFunction, call: XNode, r: Node) = {
+  def forwardExitNodeSpecific(e: XEdge, f: MicroFunction, call: XNode, r: Node) = {
     val sp           = e.source
     val XNode(c, d4) = call
     val returnPairs: Iterable[FactFunPair] =
@@ -112,7 +112,7 @@ trait JumpFuncs {
     }
   }
 
-  private[this] def forwardExitNode(e: XEdge, f: IdeFunction) {
+  private[this] def forwardExitNode(e: XEdge, f: MicroFunction) {
     for {
       (c, r) <- callReturnPairs(e.target.n)
       d4     <- forwardExitD4s.get(e, f)(c, e.source)
@@ -125,7 +125,7 @@ trait JumpFuncs {
     c: Node,
     d4: Fact,
     rn: XNode,
-    fPrime: IdeFunction
+    fPrime: MicroFunction
   ) {
     for {
       sq <- startNodes(c)
@@ -141,7 +141,7 @@ trait JumpFuncs {
    * To get d4 values in line [21], we need to remember all tuples (c, d4, sp) when we encounter them
    * in the call-processing procedure.
    */
-  private[this] def forwardExitFromCall(call: XNode, f: IdeFunction, sq: XNode) {
+  private[this] def forwardExitFromCall(call: XNode, f: MicroFunction, sq: XNode) {
     forwardExitD4s.put(call.n, sq, call.d)
     for {
       (e2, f2) <- forwardExitD4s.getQueried(call.n, sq.n)
@@ -151,7 +151,7 @@ trait JumpFuncs {
     }
   }
 
-  private[this] def forwardAnyNode(e: XEdge, f: IdeFunction) {
+  private[this] def forwardAnyNode(e: XEdge, f: MicroFunction) {
     val n = e.target
     for {
       m <- followingNodes(n.n)
@@ -168,18 +168,18 @@ trait JumpFuncs {
   private class ForwardExitD4s {
 
     private[this] val forwardExitD4s = new HashSetMultiMap[(Node, XNode), Fact]
-    private[this] val queriedExit = new HashSetMultiMap[(Node, Node), (XEdge, IdeFunction)]
+    private[this] val queriedExit = new HashSetMultiMap[(Node, Node), (XEdge, MicroFunction)]
 
     def put(call: Node, sp: XNode, d: Fact) {
       forwardExitD4s.put((call, sp), d)
     }
 
-    def get(e: XEdge, f: IdeFunction)(call: Node, sp: XNode): Set[Fact] = {
+    def get(e: XEdge, f: MicroFunction)(call: Node, sp: XNode): Set[Fact] = {
       queriedExit.put((call, sp.n), (e, f))
       forwardExitD4s.get(call, sp).asScala.toSet
     }
 
-    def getQueried(call: Node, sp: Node): Set[(XEdge, IdeFunction)] =
+    def getQueried(call: Node, sp: Node): Set[(XEdge, MicroFunction)] =
       queriedExit.get((call, sp)).asScala.toSet
   }
 }

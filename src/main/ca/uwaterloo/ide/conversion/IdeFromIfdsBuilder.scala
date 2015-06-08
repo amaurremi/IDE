@@ -18,12 +18,12 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   type IfdsOtherEdgeFn = XNode => Set[Fact]
 
   override type LatticeElem = IfdsLatticeElem
-  override type IdeFunction = IfdsFunction
+  override type MicroFunction = IfdsFunction
 
   override val Bottom: LatticeElem = IfdsBottom
   override val Top: LatticeElem    = IfdsTop
-  override val Id: IdeFunction     = IfdsIdFunction
-  override val λTop: IdeFunction   = IfdsTopFunction
+  override val Id: MicroFunction     = IfdsIdFunction
+  override val λTop: MicroFunction   = IfdsTopFunction
 
   private[this] def walaFlowFunctionMap = walaIfdsProblem.getFunctionMap
 
@@ -79,7 +79,7 @@ trait IdeFromIfdsBuilder extends IdeProblem {
     override def ⊓(el: IfdsLatticeElem): IfdsLatticeElem = IfdsBottom
   }
 
-  trait IfdsFunction extends IdeFunctionI
+  trait IfdsFunction extends MicroFunctionI
 
   case object IfdsIdFunction extends IfdsFunction {
 
@@ -110,7 +110,7 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   // todo check that this is the right assumption
   override val Λ: Int = 0
 
-  override def initialSeeds: Seq[(XEdge, IdeFunction)] = (walaIfdsProblem.initialSeeds().asScala map {
+  override def initialSeeds: Seq[(XEdge, MicroFunction)] = (walaIfdsProblem.initialSeeds().asScala map {
     e: PathEdge[Node] => 
       (XEdge(XNode(e.getEntry, e.getD1), XNode(e.getTarget, e.getD2)), Id)
   })(breakOut)
