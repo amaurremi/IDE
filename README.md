@@ -2,9 +2,9 @@
 
 The goal of this project is to make the Interprocedural Distributive Environment (IDE) [1] data-flow analysis algorithm accessible in WALA.
 
-[1] Mooly Sagiv, Thomas Reps, and Susan Horwitz. [Precise interprocedural dataflow analysis with applications to constant propagation](http://www.sciencedirect.com/science/article/pii/0304397596000722). Theoretical Computer Science, 1996.
-
 The code of the analysis is written in [Scala](http://www.scala-lang.org/). Our analysis relies on [WALA](http://wala.sourceforge.net/wiki/index.php/Main_Page), a library for static analysis on Java bytecode written in Java. To facilitate the usage of WALA in Scala, you can use the [WALAFacade](https://github.com/cos/WALAFacade) library.
+
+[1] Mooly Sagiv, Thomas Reps, and Susan Horwitz. [Precise interprocedural dataflow analysis with applications to constant propagation](http://www.sciencedirect.com/science/article/pii/0304397596000722). Theoretical Computer Science, 1996.
 
 ## Set Up
 
