@@ -1,9 +1,8 @@
 # Implementation of the IDE algorithm
 
 The goal of this project is to make the Interprocedural Distributive Environment (IDE) [1] data-flow analysis algorithm accessible in WALA.
-This is an 
 
-[1] Mooly Sagiv, Thomas Reps, and Susan Horwitz. [Precise interprocedural dataflow analysis with applications to constant propagation](http://www.sciencedirect.com/science/article/pii/0304397596000722). Springer Berlin Heidelberg, 1995.
+[1] Mooly Sagiv, Thomas Reps, and Susan Horwitz. [Precise interprocedural dataflow analysis with applications to constant propagation](http://www.sciencedirect.com/science/article/pii/0304397596000722). Theoretical Computer Science, 1996.
 
 The code of the analysis is written in [Scala](http://www.scala-lang.org/). Our analysis relies on [WALA](http://wala.sourceforge.net/wiki/index.php/Main_Page), a library for static analysis on Java bytecode written in Java. To facilitate the usage of WALA in Scala, you can use the [WALAFacade](https://github.com/cos/WALAFacade) library.
 
@@ -24,10 +23,8 @@ The code of the analysis is written in [Scala](http://www.scala-lang.org/). Our 
 IDE is a generalization of the IFDS algorithm [2]. Any IFDS problem can be transformed to an equivalent IDE problem and solved with the IDE solver.
 Using [`IdeFromIfdsBuilder`](https://github.com/amaurremi/IDE/blob/master/src/main/ca/uwaterloo/ide/conversion/IdeFromIfdsBuilder.scala), you can solve any existing WALA IFDS problem with IDE (see `ReachingDefsIdeSpec` [example](https://github.com/amaurremi/IDE/blob/master/src/test/ca/uwaterloo/ide/example/reachingDefs/ReachingDefsIdeSpec.scala)).
 
-[2] Thomas Reps, Susan Horwitz, and Mooly Sagiv. [Precise interprocedural dataflow analysis via graph reachability](http://dl.acm.org/citation.cfm?id=199462)
+[2] Thomas Reps, Susan Horwitz, and Mooly Sagiv. [Precise interprocedural dataflow analysis via graph reachability](http://dl.acm.org/citation.cfm?id=199462). Principles of Programming Languages, 1995.
 
 ## Note
 
-This is the initial version of the implementation. I am currently working on making the analysis more efficient.
-
-Examples of IDE problem implementations are going to be added.
+This is the initial version of the implementation. Work on making the analysis more efficient and adding examples of IDE problem implementations is in progress.
