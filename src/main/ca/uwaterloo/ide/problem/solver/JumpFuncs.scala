@@ -4,8 +4,7 @@ import ca.uwaterloo.ide.problem.IdeProblem
 import com.ibm.wala.util.collections.HashSetMultiMap
 
 import scala.collection.JavaConverters._
-import scala.collection.generic.CanBuildFrom
-import scala.collection.{breakOut, mutable}
+import scala.collection.mutable
 
 // p. 147 of Sagiv, Reps, Horwitz, "Precise interprocedural dataflow instance
 // with applications to constant propagation"
@@ -90,7 +89,7 @@ trait JumpFuncs {
     val XNode(c, d4) = call
     val returnPairs: Iterable[FactFunPair] =
       returnFlowFunction(c, e.target, r) match {
-        case BinaryReturnFlowFunction(fun)   =>
+        case BinaryReturnFlowFunction(fun) =>
           fun(d4)
         case UnaryReturnFlowFunction(ffps) =>
           ffps

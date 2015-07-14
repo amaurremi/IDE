@@ -2,7 +2,7 @@ package ca.uwaterloo.ide.problem.solver
 
 import ca.uwaterloo.ide.problem.IdeProblem
 
-trait IdeSolver extends JumpFuncs with ComputeValues { this: IdeProblem =>
+trait IdeSolver extends JumpFuncs with ComputeValues { this: IdeProblem with PropagatorI =>
 
   /**
    * Runs the IDE instance defined in IdeProblem.

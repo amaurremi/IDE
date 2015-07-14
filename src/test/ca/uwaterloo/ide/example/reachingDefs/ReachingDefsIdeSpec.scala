@@ -5,6 +5,7 @@ import java.lang.Iterable
 
 import ca.uwaterloo.ide.conversion.{IdeResultToIfdsResult, PartiallyBalancedIdeFromIfdsBuilder}
 import ca.uwaterloo.ide.problem.solver.IdeSolver
+import ca.uwaterloo.ide.util.Time.time
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
 import com.ibm.wala.dataflow.IFDS.PartiallyBalancedTabulationSolver
@@ -28,24 +29,18 @@ object ReachingDefsIdeSpec {
 
     println("IFDS size: " + ifdsNodesReached.size)
 
-    val problem         = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
-    val result          = problem.ideResultToIfdsResult
-    val ideNodesReached = result.getSupergraphNodesReached.asScala.toSet
+    val problem         = time ("Creating IDE reaching defs problem") { new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult }
+    val result          = time ("Computing result") { problem.ideResultToIfdsResult }
+    val ideNodesReached = time ("Computing reached nodes") { result.getSupergraphNodesReached.asScala.toSet }
 
     println("IDE size: " + ideNodesReached.size)
 
-    println("\ncontained in IFDS but not in IDE:")
-    val ifdsNotIde = ifdsNodesReached diff ideNodesReached
-    ifdsNotIde foreach {
-      n =>
-        println(n)
-    }
-
-    println("\ncontained in IDE but not in IFDS:")
-    ideNodesReached diff ifdsNodesReached foreach {
-      n =>
-        println(n)
-    }
+//    println("\ncontained in IFDS but not in IDE:")
+//    val ifdsNotIde = ifdsNodesReached diff ideNodesReached
+//    ifdsNotIde foreach println
+//
+//    println("\ncontained in IDE but not in IFDS:")
+//    ideNodesReached diff ifdsNodesReached foreach println
   }
 
   private[this] val cg = {
@@ -79,5 +74,5 @@ class ReachingDefsIdeProblem(cg: CallGraph)
   override type F = Pair[CGNode, Integer]
   override type Node = BasicBlockInContext[IExplodedBasicBlock]
   override type Procedure = CGNode
-  override def walaIfdsProblem = new ReachingDefsProblem(cg, new AnalysisCache)
+  override lazy val walaIfdsProblem = new ReachingDefsProblem(cg, new AnalysisCache)
 }

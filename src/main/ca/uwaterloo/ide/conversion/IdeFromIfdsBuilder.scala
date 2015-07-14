@@ -2,7 +2,7 @@ package ca.uwaterloo.ide.conversion
 
 import ca.uwaterloo.ide.problem.IdeProblem
 import com.ibm.wala.dataflow.IFDS._
-import com.ibm.wala.util.intset.{SparseIntSet, IntSet, IntIterator}
+import com.ibm.wala.util.intset.{IntIterator, IntSet, SparseIntSet}
 
 import scala.collection.JavaConverters._
 import scala.collection.breakOut

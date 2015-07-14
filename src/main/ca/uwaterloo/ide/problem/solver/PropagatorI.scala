@@ -2,10 +2,7 @@ package ca.uwaterloo.ide.problem.solver
 
 import ca.uwaterloo.ide.problem.PartiallyBalancedIdeFlowFunctions
 import ca.uwaterloo.ide.problem.types.LabeledExplodedGraphTypes
-import com.ibm.wala.dataflow.IFDS.{PartiallyBalancedTabulationProblem, PathEdge, IUnaryFlowFunction, IFlowFunction}
 import com.ibm.wala.util.collections.HashSetMultiMap
-import com.ibm.wala.util.debug.Assertions
-import com.ibm.wala.util.intset.{IntIterator, IntSet}
 
 import scala.collection.mutable
 

@@ -2,13 +2,13 @@ package ca.uwaterloo.ide.conversion
 
 import java.util
 
-import scala.collection.JavaConverters._
-
-import ca.uwaterloo.ide.problem.solver.IdeSolver
+import ca.uwaterloo.ide.problem.solver.{IdeSolver, PropagatorI}
 import com.ibm.wala.dataflow.IFDS.{PathEdge, TabulationProblem, TabulationResult}
 import com.ibm.wala.util.intset.{IntSet, MutableSparseIntSet}
 
-trait IdeResultToIfdsResult extends IdeFromIfdsBuilder with IdeSolver {
+import scala.collection.JavaConverters._
+
+trait IdeResultToIfdsResult extends IdeFromIfdsBuilder with IdeSolver with PropagatorI {
 
   def ideResultToIfdsResult: TabulationResult[Node, Procedure, F] =
     new TabulationResult[Node, Procedure, F] {

@@ -2,7 +2,7 @@ package ca.uwaterloo.ide.conversion
 
 import ca.uwaterloo.ide.problem.PartiallyBalancedIdeFlowFunctions
 import ca.uwaterloo.ide.problem.solver.PartiallyBalancedPropagator
-import com.ibm.wala.dataflow.IFDS.{IUnaryFlowFunction, TabulationProblem, IPartiallyBalancedFlowFunctions, PartiallyBalancedTabulationProblem}
+import com.ibm.wala.dataflow.IFDS.{IUnaryFlowFunction, PartiallyBalancedTabulationProblem}
 
 trait PartiallyBalancedIdeFromIfdsBuilder
   extends IdeFromIfdsBuilder
