@@ -20,7 +20,7 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
   /**
    * The type for a lattice element for the set L
    */
-  type LatticeElem <: Lattice[LatticeElem]
+  type LatticeElem <: LatticeElementI[LatticeElem]
 
   /**
    * Lattice top element
@@ -35,7 +35,7 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
   /**
    * A lattice for elements of the set L
    */
-  trait Lattice[L <: Lattice[L]] {
+  trait LatticeElementI [L <: LatticeElementI[L]] {
 
     def ⊓(el: L): L
 
@@ -64,7 +64,7 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
     /**
      * It's necessary to implement the equals method on IDE functions.
      */
-    override def equals(obj: Any): Boolean
+    override def equals(obj: Any): Boolean = ???
   }
 
   case class Seed(edge: XEdge, f: MicroFunction)

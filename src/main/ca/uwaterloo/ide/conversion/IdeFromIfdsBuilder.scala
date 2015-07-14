@@ -69,7 +69,7 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   def zipWithId(iterator: Iterable[Fact]): Iterable[FactFunPair] =
     iterator map { FactFunPair(_, IfdsIdFunction) }
 
-  trait IfdsLatticeElem extends Lattice[IfdsLatticeElem]
+  trait IfdsLatticeElem extends LatticeElementI[IfdsLatticeElem]
 
   case object IfdsTop extends IfdsLatticeElem {
     override def ⊓(el: IfdsLatticeElem): IfdsLatticeElem = el
@@ -99,13 +99,12 @@ trait IdeFromIfdsBuilder extends IdeProblem {
     override def ⊓(f: IfdsFunction): IfdsFunction = f
   }
 
-  private[this] def intIteratorToScala(intIterator: IntIterator): Iterable[Int] = {
-    var set = Iterable[Int]()
-    while (intIterator.hasNext) {
-      set ++= Seq(intIterator.next)
-    }
-    set
-  }
+  private[this] def intIteratorToScala(intIterator: IntIterator): Iterable[Int] =
+    new Iterator[Int] {
+      override def hasNext: Boolean = intIterator.hasNext
+
+      override def next(): Int = intIterator.next()
+    }.toIterable
 
   // todo check that this is the right assumption
   override val Λ: Int = 0

@@ -29,9 +29,9 @@ object ReachingDefsIdeSpec {
 
     println("IFDS size: " + ifdsNodesReached.size)
 
-    val problem         = time ("Creating IDE reaching defs problem") { new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult }
-    val result          = time ("Computing result") { problem.ideResultToIfdsResult }
-    val ideNodesReached = time ("Computing reached nodes") { result.getSupergraphNodesReached.asScala.toSet }
+    val problem         = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
+    val result          = problem.ideResultToIfdsResult
+    val ideNodesReached = time ("Computing IDE reaching defs result") { result.getSupergraphNodesReached.asScala.toSet }
 
     println("IDE size: " + ideNodesReached.size)
 

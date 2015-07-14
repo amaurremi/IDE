@@ -1,6 +1,7 @@
 package ca.uwaterloo.ide.problem.solver
 
 import ca.uwaterloo.ide.problem.IdeProblem
+import ca.uwaterloo.ide.util.Time.time
 
 trait IdeSolver extends JumpFuncs with ComputeValues { this: IdeProblem with PropagatorI =>
 
@@ -9,6 +10,6 @@ trait IdeSolver extends JumpFuncs with ComputeValues { this: IdeProblem with Pro
    */
   lazy val solvedResult: Map[XNode, LatticeElem] = {
     // computeJumpFuncs corresponds to Phase I of the algorithm, computeValues corresponds to Phase II.
-    computeValues(computeJumpFuncs)
+    timeComputeValues(time("computing jump functions") { computeJumpFuncs })
   }
 }
