@@ -7,6 +7,7 @@ import ca.uwaterloo.ide.conversion.PartiallyBalancedIdeFromIfdsBuilder
 import ca.uwaterloo.ide.util.Time.time
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
+import com.ibm.wala.dataflow.IFDS.PartiallyBalancedTabulationSolver
 import com.ibm.wala.examples.analysis.dataflow.DataflowTest
 import com.ibm.wala.ipa.callgraph._
 import com.ibm.wala.ipa.callgraph.impl.Util
@@ -21,11 +22,11 @@ import scala.collection.JavaConverters._
 object ReachingDefsIdeSpec {
 
   def main(args: Array[String]): Unit = {
-//    val originalIfdsSolver = PartiallyBalancedTabulationSolver.createPartiallyBalancedTabulationSolver(new ReachingDefsProblem(cg, new AnalysisCache), null)
-//    val originalResult     = originalIfdsSolver.solve
-//    val ifdsNodesReached   = originalResult.getSupergraphNodesReached.asScala.toSet
-//
-//    println("IFDS size: " + ifdsNodesReached.size)
+    val originalIfdsSolver = PartiallyBalancedTabulationSolver.createPartiallyBalancedTabulationSolver(new ReachingDefsProblem(cg, new AnalysisCache), null)
+    val originalResult     = originalIfdsSolver.solve
+    val ifdsNodesReached   = originalResult.getSupergraphNodesReached.asScala.toSet
+
+    println("IFDS size: " + ifdsNodesReached.size)
 
     val problem         = new ReachingDefsIdeProblem(cg)
     val result          = problem.ideResultToIfdsResult

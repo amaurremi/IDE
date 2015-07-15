@@ -87,7 +87,7 @@ trait JumpFuncs {
   def forwardExitNodeSpecific(e: XEdge, f: MicroFunction, call: XNode, r: Node) = {
     val sp           = e.source
     val XNode(c, d4) = call
-    val returnPairs: Iterable[FactFunPair] =
+    val returnPairs: Iterator[FactFunPair] =
       returnFlowFunction(c, e.target, r) match {
         case BinaryReturnFlowFunction(fun) =>
           fun(d4)

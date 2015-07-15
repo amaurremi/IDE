@@ -16,7 +16,7 @@ trait PartiallyBalancedIdeFromIfdsBuilder
 
   override def fakeEntry(n: Node) = walaIfdsProblem.getFakeEntry(n)
 
-  def unbalancedReturnFlowFunction(src: XNode, dest: Node): Iterable[FactFunPair] =
+  def unbalancedReturnFlowFunction(src: XNode, dest: Node): Iterator[FactFunPair] =
     walaIfdsProblem.getFunctionMap.getUnbalancedReturnFlowFunction(src.n, dest) match {
       case f: IUnaryFlowFunction =>
         zipWithId(unaryIterator(f, src))

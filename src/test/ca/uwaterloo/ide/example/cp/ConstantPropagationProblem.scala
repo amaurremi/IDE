@@ -7,17 +7,17 @@ class ConstantPropagationProblem extends IdeProblem {
   /**
    * Functions for inter-procedural edges from a call node to the corresponding start edges.
    */
-  override def callFlowFunction(src: XNode, dest: ConstantPropagationProblem.this.type, ret: ConstantPropagationProblem.this.type): Iterable[FactFunPair] = ???
+  override def callFlowFunction(src: XNode, dest: ConstantPropagationProblem.this.type, ret: ConstantPropagationProblem.this.type): Iterator[FactFunPair] = ???
 
   /**
    * Functions for intra-procedural edges from a call to the corresponding return edges.
    */
-  override def callToReturnFlowFunction(src: XNode, dest: ConstantPropagationProblem.this.type): Iterable[FactFunPair] = ???
+  override def callToReturnFlowFunction(src: XNode, dest: ConstantPropagationProblem.this.type): Iterator[FactFunPair] = ???
 
   /**
    * the flow function for a call-return edge, when the supergraph does not contain any callees of src
    */
-  override def callNoneToReturnFlowFunction(src: XNode, dest: ConstantPropagationProblem.this.type): Iterable[FactFunPair] = ???
+  override def callNoneToReturnFlowFunction(src: XNode, dest: ConstantPropagationProblem.this.type): Iterator[FactFunPair] = ???
 
   /**
    * Functions for inter-procedural edges from an end node to the return node of the callee function.
@@ -27,7 +27,7 @@ class ConstantPropagationProblem extends IdeProblem {
   /**
    * Functions for all other (inter-procedural) edges.
    */
-  override def normalFlowFunction(src: XNode, dest: ConstantPropagationProblem.this.type): Iterable[FactFunPair] = ???
+  override def normalFlowFunction(src: XNode, dest: ConstantPropagationProblem.this.type): Iterator[FactFunPair] = ???
 
   /**
    * The main method nodes that should be the entry points for the instance

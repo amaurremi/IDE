@@ -50,23 +50,23 @@ trait IdeFromIfdsBuilder extends IdeProblem {
   override def callNoneToReturnFlowFunction(src: XNode, dest: Node)
     = zipWithId(unaryIterator(walaFlowFunctionMap.getCallNoneToReturnFlowFunction(src.n, dest), src))
 
-  def unaryIterator(flowFunction: IUnaryFlowFunction, src: XNode): Iterable[Fact] =
-    if (flowFunction == null) Seq()
+  def unaryIterator(flowFunction: IUnaryFlowFunction, src: XNode): Iterator[Fact] =
+    if (flowFunction == null) Iterator.empty
     else {
       val targets: IntSet = flowFunction.getTargets(src.d)
-      if (targets == null) Seq()
+      if (targets == null) Iterator.empty
       else intIteratorToScala(targets.intIterator)
     }
 
-  private[this] def binaryIterator(flowFunction: IBinaryReturnFlowFunction, src: XNode, d: Fact): Iterable[Fact] =
-    if (flowFunction == null) Seq()
+  private[this] def binaryIterator(flowFunction: IBinaryReturnFlowFunction, src: XNode, d: Fact): Iterator[Fact] =
+    if (flowFunction == null) Iterator.empty
     else {
       val targets: SparseIntSet = flowFunction.getTargets(d, src.d)
-      if (targets == null) Seq()
+      if (targets == null) Iterator.empty
       else intIteratorToScala(targets.intIterator)
     }
 
-  def zipWithId(iterator: Iterable[Fact]): Iterable[FactFunPair] =
+  def zipWithId(iterator: Iterator[Fact]): Iterator[FactFunPair] =
     iterator map { FactFunPair(_, IfdsIdFunction) }
 
   trait IfdsLatticeElem extends LatticeElementI[IfdsLatticeElem]
@@ -99,12 +99,12 @@ trait IdeFromIfdsBuilder extends IdeProblem {
     override def ⊓(f: IfdsFunction): IfdsFunction = f
   }
 
-  private[this] def intIteratorToScala(intIterator: IntIterator): Iterable[Int] =
+  private[this] def intIteratorToScala(intIterator: IntIterator): Iterator[Int] =
     new Iterator[Int] {
       override def hasNext: Boolean = intIterator.hasNext
 
       override def next(): Int = intIterator.next()
-    }.toIterable
+    }
 
   // todo check that this is the right assumption
   override val Λ: Int = 0

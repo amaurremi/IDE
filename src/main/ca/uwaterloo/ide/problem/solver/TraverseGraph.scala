@@ -5,21 +5,18 @@ import com.ibm.wala.util.Predicate
 import com.ibm.wala.util.graph.traverse.DFS
 
 import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 trait TraverseGraph { this: ExplodedGraphTypes =>
 
-  private[this] val followingNodesCache = mutable.Map[Node, Iterable[Node]]()
+  private[this] val followingNodesCache = mutable.Map[Node, Iterator[Node]]()
 
   private[this] val enclProcCache = mutable.Map[Node, Procedure]()
 
   private[this] val startNodeCache = mutable.Map[Node, Iterable[Node]]()
 
-  def followingNodes(n: Node): Iterable[Node] =
-    followingNodesCache.getOrElseUpdate(n,
-      (supergraph getSuccNodes n).toIterable
-    )
+  def followingNodes(n: Node): Iterator[Node] =
+    followingNodesCache.getOrElseUpdate(n, supergraph getSuccNodes n)
 
   /**
    * Returns the enclosing procedure of a given node.
@@ -30,18 +27,18 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
   /**
    * Given a call node n, returns the start nodes of n's target procedures.
    */
-  def targetStartNodes(n: Node): Iterable[Node] =
-    (supergraph getCalledNodes n).toIterable
+  def targetStartNodes(n: Node): Iterator[Node] =
+    supergraph getCalledNodes n
 
   /**
    * Return-site nodes that correspond to call node n to target start node s
    */
-  def returnNodes(n: Node, s: Option[Node]): Iterable[Node] = {
+  def returnNodes(n: Node, s: Option[Node]): Iterator[Node] = {
     val proc = s match {
       case Some(sn) => enclProc(sn)
       case None     => null.asInstanceOf[Procedure]
     }
-    supergraph.getReturnSites(n, proc).toIterable
+    supergraph getReturnSites (n, proc)
   }
 
   /**
@@ -56,7 +53,7 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
    * Given the exit node of procedure p, returns all pairs (c, r), where c calls p with corresponding
    * return-site node r.
    */
-  def callReturnPairs(exit: Node): Iterable[(Node, Node)] = // todo is that right?
+  def callReturnPairs(exit: Node): Iterator[(Node, Node)] = // todo is that right?
     for {
       r <- followingNodes(exit)
       rn = r
@@ -64,8 +61,8 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
       if followingNodes(c) contains rn
     } yield c -> r
 
-  def getCallSites(node: Node, proc: Procedure): Iterable[Node] =
-    supergraph.getCallSites(node, proc).toIterable
+  def getCallSites(node: Node, proc: Procedure): Iterator[Node] =
+    supergraph getCallSites (node, proc)
 
   /**
    * All call nodes inside of a given procedure
@@ -81,5 +78,5 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
     nodesInProc filter supergraph.isCall
   }
 
-  def traverseSupergraph = supergraph.iterator.asScala
+  def traverseSupergraph = supergraph.iterator
 }
