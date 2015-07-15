@@ -10,28 +10,28 @@ import scala.collection.mutable
 
 trait TraverseGraph { this: ExplodedGraphTypes =>
 
-  private[this] val followingNodesCache = mutable.Map[Node, Seq[Node]]()
+  private[this] val followingNodesCache = mutable.Map[Node, Iterable[Node]]()
 
   private[this] val enclProcCache = mutable.Map[Node, Procedure]()
 
-  private[this] val startNodeCache = mutable.Map[Node, Seq[Node]]()
+  private[this] val startNodeCache = mutable.Map[Node, Iterable[Node]]()
 
-  def followingNodes(n: Node): Seq[Node] =
+  def followingNodes(n: Node): Iterable[Node] =
     followingNodesCache.getOrElseUpdate(n,
-      (supergraph getSuccNodes n).asScala.toSeq
+      (supergraph getSuccNodes n).toIterable
     )
 
   /**
    * Returns the enclosing procedure of a given node.
    */
   def enclProc(node: Node): Procedure =
-    enclProcCache.getOrElseUpdate(node, supergraph.getProcOf(node))
+    enclProcCache getOrElseUpdate (node, supergraph.getProcOf(node))
 
   /**
    * Given a call node n, returns the start nodes of n's target procedures.
    */
   def targetStartNodes(n: Node): Iterable[Node] =
-    (supergraph getCalledNodes n).asScala.toIterable
+    (supergraph getCalledNodes n).toIterable
 
   /**
    * Return-site nodes that correspond to call node n to target start node s
@@ -41,22 +41,22 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
       case Some(sn) => enclProc(sn)
       case None     => null.asInstanceOf[Procedure]
     }
-    supergraph.getReturnSites(n, proc).asScala.toIterable
+    supergraph.getReturnSites(n, proc).toIterable
   }
 
   /**
    * Returns the start node of the node's enclosing procedure.
    */
-  def startNodes(n: Node): Seq[Node] =
+  def startNodes(n: Node): Iterable[Node] =
     startNodeCache.getOrElseUpdate(
       n,
-      (supergraph getEntriesForProcedure enclProc(n)).view.toSeq)
+      supergraph getEntriesForProcedure enclProc(n))
 
   /**
    * Given the exit node of procedure p, returns all pairs (c, r), where c calls p with corresponding
    * return-site node r.
    */
-  def callReturnPairs(exit: Node): Seq[(Node, Node)] = // todo is that right?
+  def callReturnPairs(exit: Node): Iterable[(Node, Node)] = // todo is that right?
     for {
       r <- followingNodes(exit)
       rn = r
@@ -65,19 +65,19 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
     } yield c -> r
 
   def getCallSites(node: Node, proc: Procedure): Iterable[Node] =
-    supergraph.getCallSites(node, proc).asScala.toIterable
+    supergraph.getCallSites(node, proc).toIterable
 
   /**
    * All call nodes inside of a given procedure
    */
-  def callNodesInProc(p: Procedure): Seq[Node] = {
+  def callNodesInProc(p: Procedure): Iterable[Node] = {
     val nodesInProc = DFS.getReachableNodes(
       supergraph,
-      (supergraph getEntriesForProcedure p).toSeq,
+      (supergraph getEntriesForProcedure p).toIterable,
       new Predicate[Node]() {
         override def test(n: Node): Boolean = enclProc(n) == p
       }
-    ).toSeq
+    )
     nodesInProc filter supergraph.isCall
   }
 

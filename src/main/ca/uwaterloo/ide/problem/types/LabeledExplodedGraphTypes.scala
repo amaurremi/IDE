@@ -60,11 +60,6 @@ trait LabeledExplodedGraphTypes extends ExplodedGraphTypes {
      * Compose operator
      */
     def ◦(f: MicroFunction): MicroFunction
-
-    /**
-     * It's necessary to implement the equals method on IDE functions.
-     */
-    override def equals(obj: Any): Boolean = ???
   }
 
   case class Seed(edge: XEdge, f: MicroFunction)
