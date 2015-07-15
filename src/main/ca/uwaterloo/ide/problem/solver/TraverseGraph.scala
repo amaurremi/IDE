@@ -11,9 +11,9 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
 
   private[this] val followingNodesCache = mutable.Map[Node, Iterator[Node]]()
 
-  private[this] val enclProcCache = mutable.Map[Node, Procedure]()
+  private[this] val enclProcCache       = mutable.Map[Node, Procedure]()
 
-  private[this] val startNodeCache = mutable.Map[Node, Iterable[Node]]()
+  private[this] val startNodeCache      = mutable.Map[Node, Iterable[Node]]()
 
   def followingNodes(n: Node): Iterator[Node] =
     followingNodesCache.getOrElseUpdate(n, supergraph getSuccNodes n)
@@ -22,7 +22,7 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
    * Returns the enclosing procedure of a given node.
    */
   def enclProc(node: Node): Procedure =
-    enclProcCache getOrElseUpdate (node, supergraph.getProcOf(node))
+    enclProcCache getOrElseUpdate (node, supergraph getProcOf node)
 
   /**
    * Given a call node n, returns the start nodes of n's target procedures.
@@ -61,8 +61,7 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
       if followingNodes(c) contains rn
     } yield c -> r
 
-  def getCallSites(node: Node, proc: Procedure): Iterator[Node] =
-    supergraph getCallSites (node, proc)
+  private[this] def getCallSites(node: Node, proc: Procedure): Iterator[Node] =
 
   /**
    * All call nodes inside of a given procedure
@@ -77,6 +76,4 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
     )
     nodesInProc filter supergraph.isCall
   }
-
-  def traverseSupergraph = supergraph.iterator
 }

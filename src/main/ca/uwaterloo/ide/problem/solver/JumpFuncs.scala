@@ -47,9 +47,8 @@ trait JumpFuncs {
     val n = e.target
     // [12-13]
     val node = n.n
-    val targetNodes = targetStartNodes(node)
     for {
-      sq <- targetNodes
+      sq <- targetStartNodes(node)
       r  <- returnNodes(node, Some(sq))
       d3 <- callStartD2s(n, sq, r)
     } {
@@ -58,10 +57,11 @@ trait JumpFuncs {
       forwardExitFromCall(n, f, sqn)
     }
     // [14-16]
-    if (targetNodes.isEmpty)
+    val targetStartNodesIterator = targetStartNodes(node)
+    if (targetStartNodesIterator.isEmpty)
       forwardCallReturn(e, None, f)
     else
-      targetNodes foreach {
+      targetStartNodesIterator foreach {
         sq =>
           forwardCallReturn(e, Some(sq), f)
       }
@@ -153,7 +153,7 @@ trait JumpFuncs {
   private[this] def forwardAnyNode(e: XEdge, f: MicroFunction) {
     val n = e.target
     for {
-      m <- followingNodes(n.n)
+      m                       <- followingNodes(n.n)
       FactFunPair(d3, edgeFn) <- normalFlowFunction(n, m)
     } {
       propagate(XEdge(e.source, XNode(m, d3)), edgeFn ◦ f)
@@ -167,7 +167,7 @@ trait JumpFuncs {
   private class ForwardExitD4s {
 
     private[this] val forwardExitD4s = new HashSetMultiMap[(Node, XNode), Fact]
-    private[this] val queriedExit = new HashSetMultiMap[(Node, Node), (XEdge, MicroFunction)]
+    private[this] val queriedExit    = new HashSetMultiMap[(Node, Node), (XEdge, MicroFunction)]
 
     def put(call: Node, sp: XNode, d: Fact) {
       forwardExitD4s.put((call, sp), d)

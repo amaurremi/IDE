@@ -53,7 +53,7 @@ trait BalancedPropagator extends PropagatorI {
 trait PartiallyBalancedPropagator extends PropagatorI with TraverseGraph { this: PartiallyBalancedIdeFlowFunctions =>
 
   private[this] def wasUsedAsUnbalancedSeed(e: XEdge): Boolean =
-    unbalancedSeeds.contains(e.source)
+    unbalancedSeeds contains e.source
 
   private[this] val unbalancedSeeds = mutable.Set[XNode](initialSeeds map {
     _._1.source
