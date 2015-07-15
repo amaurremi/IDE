@@ -62,6 +62,7 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
     } yield c -> r
 
   private[this] def getCallSites(node: Node, proc: Procedure): Iterator[Node] =
+    supergraph getCallSites (node, proc)
 
   /**
    * All call nodes inside of a given procedure
