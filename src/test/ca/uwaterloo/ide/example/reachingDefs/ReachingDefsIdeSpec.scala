@@ -3,8 +3,7 @@ package ca.uwaterloo.ide.example.reachingDefs
 import java.io.ByteArrayInputStream
 import java.lang.Iterable
 
-import ca.uwaterloo.ide.conversion.{IdeResultToIfdsResult, PartiallyBalancedIdeFromIfdsBuilder}
-import ca.uwaterloo.ide.problem.solver.IdeSolver
+import ca.uwaterloo.ide.conversion.PartiallyBalancedIdeFromIfdsBuilder
 import ca.uwaterloo.ide.util.Time.time
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil
 import com.ibm.wala.core.tests.util.TestConstants
@@ -28,7 +27,7 @@ object ReachingDefsIdeSpec {
 //
 //    println("IFDS size: " + ifdsNodesReached.size)
 
-    val problem         = new ReachingDefsIdeProblem(cg) with IdeResultToIfdsResult
+    val problem         = new ReachingDefsIdeProblem(cg)
     val result          = problem.ideResultToIfdsResult
     val ideNodesReached = time ("Computing IDE reaching defs result") { result.getSupergraphNodesReached.asScala.toSet }
 
@@ -66,10 +65,7 @@ object ReachingDefsIdeSpec {
   }
 }
 
-class ReachingDefsIdeProblem(cg: CallGraph)
-  extends PartiallyBalancedIdeFromIfdsBuilder
-  with IdeSolver
-{
+class ReachingDefsIdeProblem(cg: CallGraph) extends PartiallyBalancedIdeFromIfdsBuilder {
   override type F = Pair[CGNode, Integer]
   override type Node = BasicBlockInContext[IExplodedBasicBlock]
   override type Procedure = CGNode

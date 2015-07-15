@@ -1,13 +1,15 @@
 package ca.uwaterloo.ide.conversion
 
 import ca.uwaterloo.ide.problem.PartiallyBalancedIdeFlowFunctions
-import ca.uwaterloo.ide.problem.solver.PartiallyBalancedPropagator
+import ca.uwaterloo.ide.problem.solver.{IdeSolver, PartiallyBalancedPropagator}
 import com.ibm.wala.dataflow.IFDS.{IUnaryFlowFunction, PartiallyBalancedTabulationProblem}
 
 trait PartiallyBalancedIdeFromIfdsBuilder
   extends IdeFromIfdsBuilder
   with PartiallyBalancedIdeFlowFunctions
   with PartiallyBalancedPropagator
+  with IdeResultToIfdsResult
+  with IdeSolver
 {
 
   override def walaIfdsProblem: PartiallyBalancedTabulationProblem[Node, Procedure, F]
