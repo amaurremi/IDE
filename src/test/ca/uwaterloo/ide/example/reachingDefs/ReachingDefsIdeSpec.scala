@@ -59,7 +59,7 @@ object ReachingDefsIdeSpec {
         "java\\/security\\/.*\n"
     scope.setExclusions(new FileOfClasses(new ByteArrayInputStream(exclusions.getBytes("UTF-8"))))
     val cha = ClassHierarchy.make(scope)
-    val entrypoints: Iterable[Entrypoint] = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha, "Ldataflow/Simple")
+    val entrypoints: Iterable[Entrypoint] = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha, "Ldataflow/VerySimple")
     val options: AnalysisOptions = CallGraphTestUtil.makeAnalysisOptions(scope, entrypoints)
     val builder: CallGraphBuilder = Util.makeZeroOneCFABuilder(options, new AnalysisCache, cha, scope)
     builder.makeCallGraph(options, null)
