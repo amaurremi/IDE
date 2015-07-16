@@ -127,7 +127,7 @@ trait JumpFuncs {
     fPrime: MicroFunction
   ) {
     for {
-      sq <- startNodes(c)
+      sq <- startNodes(enclProc(c))
       (d3, f3) <- forwardExitD3s.get(sq, XNode(c, d4)).asScala
       if f3 != λTop
     } {

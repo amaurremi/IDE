@@ -14,7 +14,7 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
 
   private[this] val enclProcCache = mutable.Map[Node, Procedure]()
 
-  private[this] val startNodeCache = mutable.Map[Node, Iterable[Node]]()
+  private[this] val startNodeCache = mutable.Map[Procedure, Iterable[Node]]()
 
   def followingNodes(n: Node): Iterable[Node] =
     followingNodesCache.getOrElseUpdate(n, (supergraph getSuccNodes n).toIterable)
@@ -45,10 +45,8 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
   /**
    * Returns the start node of the node's enclosing procedure.
    */
-  def startNodes(n: Node): Iterable[Node] =
-    startNodeCache.getOrElseUpdate(
-      n,
-      supergraph getEntriesForProcedure enclProc(n))
+  def startNodes(p: Procedure): Iterable[Node] =
+    startNodeCache getOrElseUpdate (p, (supergraph getEntriesForProcedure p).toIterable)
 
   /**
    * Given the exit node of procedure p, returns all pairs (c, r), where c calls p with corresponding
@@ -71,7 +69,7 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
   def callNodesInProc(p: Procedure): Iterable[Node] = {
     val nodesInProc = DFS.getReachableNodes(
       supergraph,
-      (supergraph getEntriesForProcedure p).toIterable,
+      startNodes(p),
       new Predicate[Node]() {
         override def test(n: Node): Boolean = enclProc(n) == p
       }
