@@ -17,9 +17,7 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
   private[this] val startNodeCache = mutable.Map[Node, Iterable[Node]]()
 
   def followingNodes(n: Node): Iterable[Node] =
-    followingNodesCache.getOrElseUpdate(n,
-      (supergraph getSuccNodes n).toIterable
-    )
+    followingNodesCache.getOrElseUpdate(n, (supergraph getSuccNodes n).toIterable)
 
   /**
    * Returns the enclosing procedure of a given node.
