@@ -12,9 +12,9 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
 
   private[this] val followingNodesCache = mutable.Map[Node, Iterable[Node]]()
 
-  private[this] val enclProcCache = mutable.Map[Node, Procedure]()
+//  private[this] val enclProcCache = mutable.Map[Node, Procedure]()
 
-  private[this] val startNodeCache = mutable.Map[Procedure, Iterable[Node]]()
+//  private[this] val startNodeCache = mutable.Map[Procedure, Iterable[Node]]()
 
   def followingNodes(n: Node): Iterable[Node] =
     followingNodesCache.getOrElseUpdate(n, (supergraph getSuccNodes n).toIterable)
@@ -23,7 +23,8 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
    * Returns the enclosing procedure of a given node.
    */
   def enclProc(node: Node): Procedure =
-    enclProcCache getOrElseUpdate (node, supergraph.getProcOf(node))
+//    enclProcCache getOrElseUpdate (node, supergraph.getProcOf(node))
+    supergraph getProcOf node
 
   /**
    * Given a call node n, returns the start nodes of n's target procedures.
@@ -46,7 +47,8 @@ trait TraverseGraph { this: ExplodedGraphTypes =>
    * Returns the start node of the node's enclosing procedure.
    */
   def startNodes(p: Procedure): Iterable[Node] =
-    startNodeCache getOrElseUpdate (p, (supergraph getEntriesForProcedure p).toIterable)
+//    startNodeCache getOrElseUpdate (p, (supergraph getEntriesForProcedure p).toIterable)
+    (supergraph getEntriesForProcedure p).toIterable
 
   /**
    * Given the exit node of procedure p, returns all pairs (c, r), where c calls p with corresponding
